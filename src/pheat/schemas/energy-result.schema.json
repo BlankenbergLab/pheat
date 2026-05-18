@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/energy-result.schema.json",
+  "title": "PHEAT Energy Result",
+  "description": "Canonical JSON representation for a PHEAT scoring result.",
+  "type": "object",
+  "required": [
+    "model",
+    "total",
+    "units",
+    "terms",
+    "warnings",
+    "citations",
+    "metadata"
+  ],
+  "properties": {
+    "model": {
+      "type": "string"
+    },
+    "total": {
+      "type": "number"
+    },
+    "units": {
+      "type": "string"
+    },
+    "terms": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,16 @@
+{
+  "artifact_version": "v0",
+  "format": "pheat.reference-unattended-run",
+  "outputs": {
+    "decoys_aqueous": "reference-builds/decoys/protein-heavy-30id-xray-aqueous-v0-pheat-torsion",
+    "features_aqueous": "reference-builds/features/v0/aqueous-features.jsonl",
+    "model_aqueous": "reference-builds/models/v0/pheat-ml-linear-aqueous.json",
+    "set_aqueous": "reference-builds/sets/protein-heavy-30id-xray-aqueous-v0",
+    "tables_aqueous": "reference-builds/tables/protein-heavy-30id-xray-aqueous-v0",
+    "validation_aqueous": "reference-builds/validation/v0/aqueous-validation.json"
+  },
+  "pheat_version": "0.1.0",
+  "provisional": true,
+  "status": "completed",
+  "version": 1
+}

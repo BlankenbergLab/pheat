@@ -1,0 +1,17 @@
+{
+  "format": "pheat.radius-of-gyration-result",
+  "input": "tests/fixtures/tiny.pdb",
+  "radius_of_gyration": {
+    "atom_count": 12,
+    "atom_set": "all-heavy",
+    "mass_source": "ciaaw-standard-atomic-weights-2024",
+    "mode": "both",
+    "units": "angstrom",
+    "unknown_elements": [],
+    "values": {
+      "mass_weighted": 5.000836110923804,
+      "unweighted": 4.65348276010679
+    }
+  },
+  "version": 1
+}

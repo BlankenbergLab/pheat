@@ -1,0 +1,46 @@
+{
+  "format": "pheat.packaged-geometry-manifest",
+  "version": 1,
+  "tables": [
+    {
+      "id": "ccd-sidechain-geometry-v1",
+      "artifact_id": "ccd-sidechain-geometry",
+      "artifact_label": "ccd-sidechain-geometry-v1",
+      "artifact_version": "v1",
+      "default_profile": "ccd-sidechains",
+      "description": "PHEAT side-chain reconstruction geometry derived from the full wwPDB Chemical Component Dictionary.",
+      "filename": "ccd-sidechain-geometry-v1.json",
+      "format": "pheat.geometry-table-set",
+      "generated_at": "2026-05-21T18:07:24.051445Z",
+      "generated_with_pheat_version": "0.1.0",
+      "generation_command": [
+        "pheat",
+        "geometry",
+        "tables",
+        "build-sidechain-ccd",
+        "--ccd-full",
+        "components.cif.gz",
+        "--output-root",
+        "derived/ccd-sidechains",
+        "--table-set-id",
+        "ccd-sidechain-geometry",
+        "--table-set-version",
+        "v1"
+      ],
+      "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "profile_ids": [
+        "ccd-sidechains"
+      ],
+      "residue_count": 29,
+      "source": "wwpdb-ccd-full",
+      "source_bytes": 116061023,
+      "source_downloaded_at": "2026-05-21T16:59:37.574132Z",
+      "source_last_modified": "Sun, 17 May 2026 00:28:08 GMT",
+      "source_sha256": "8445834146005da11d4cfe947024b36135a702a12c9b08e9ca6bf666cc0de168",
+      "source_url": "https://files.wwpdb.org/pub/pdb/data/monomers/components.cif.gz",
+      "table_bytes": 44752,
+      "table_sha256": "bd05338a4cb7e759d1c0d2f98654cb7b0627747c20c3397f71d45fec4544ec16"
+    }
+  ]
+}

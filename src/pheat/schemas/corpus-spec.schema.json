@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/corpus-spec.schema.json",
+  "title": "PHEAT corpus specification",
+  "type": "object",
+  "required": ["corpus_id", "version", "source", "selection"],
+  "additionalProperties": true,
+  "properties": {
+    "corpus_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "required": ["type", "format"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "enum": ["rcsb_snapshot", "local_archive", "id_list", "mixed"]
+        },
+        "format": {
+          "enum": ["pdb", "mmcif", "bcif", "mixed"]
+        },
+        "snapshot_date": {
+          "type": "string"
+        },
+        "snapshot_label": {
+          "type": "string"
+        },
+        "source_root": {
+          "type": "string"
+        },
+        "ids_file": {
+          "type": "string"
+        },
+        "license_note": {
+          "type": "string"
+        }
+      }
+    },
+    "selection": {
+      "type": "object",
+      "required": ["atom_domain"],
+      "additionalProperties": true,
+      "properties": {
+        "atom_domain": {
+          "enum": ["protein-heavy", "all-heavy", "backbone", "ca-only", "full"]
+        },
+        "experimental_methods": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "max_resolution_angstrom": {
+          "type": "number"
+        },
+        "min_length": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_length": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "include_chains": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "exclude_chains": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "include_ligands": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "exclude_ligands": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "sequence_identity": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "method": {"type": "string"},
+            "threshold": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "require_complete_backbone": {"type": "boolean"},
+        "allow_modified_residues": {"type": "boolean"},
+        "allow_altlocs": {"type": "boolean"},
+        "allow_insertion_codes": {"type": "boolean"}
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "store_lengths": {"type": ["string", "array", "boolean"]},
+        "store_angles": {
+          "type": "array",
+          "items": {"enum": ["omega", "tau", "theta"]}
+        },
+        "store_chi": {"type": ["string", "integer", "boolean"]},
+        "reconstruction_mode": {"type": "string"}
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "table_set": {"type": "string"},
+        "burial_methods": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "decoys": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "recipe": {"type": "string"},
+        "n_per_native": {"type": "integer", "minimum": 0},
+        "seed": {"type": "integer"}
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "include_manifest": {"type": "boolean"},
+        "include_features": {"type": "boolean"},
+        "include_score_tables": {"type": "boolean"},
+        "include_decoys": {"type": "boolean"},
+        "compression": {"enum": ["none", "gzip", "xz"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "pheat_version": {"type": "string"},
+        "created_by": {"type": "string"},
+        "notes": {"type": ["string", "array"]}
+      }
+    }
+  }
+}

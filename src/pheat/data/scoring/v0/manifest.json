@@ -1,0 +1,196 @@
+{
+  "artifact_version": "v0",
+  "assets": {
+    "pheat-ml-linear-aqueous-v0": {
+      "bytes": 1384,
+      "compression": "xz",
+      "compression_preset": 6,
+      "kind": "ml-linear-model",
+      "path": "pheat-ml-linear-aqueous.json.xz",
+      "sha256": "51bafa8b047f6f0fcbb385e3738d1abbab04ed242ae4f2f2f33b62d81e7f5580",
+      "source_bytes": 5230,
+      "source_path": "reference-builds/models/v0/pheat-ml-linear-aqueous.json",
+      "source_sha256": "dc67f3660c51ddc4d29f72588fd9cc463ffc494eee3aab97a6d63bbcde696f98",
+      "subset": "aqueous",
+      "uncompressed_bytes": 5416,
+      "uncompressed_sha256": "b37caf9a9a896baaf8a8641ced09d812c379e1597dddbdebef8f9a28eafc7d64"
+    },
+    "pheat-ml-linear-membrane-v0": {
+      "bytes": 1376,
+      "compression": "xz",
+      "compression_preset": 6,
+      "kind": "ml-linear-model",
+      "path": "pheat-ml-linear-membrane.json.xz",
+      "sha256": "98d4d274b291c762a2d6e8d4535830ce55cfe2de272f435c1b8fc2a7fa060e7e",
+      "source_bytes": 5217,
+      "source_path": "reference-builds/models/v0/pheat-ml-linear-membrane.json",
+      "source_sha256": "aa1b41eddf66329882dca79a7e46e29a2ad1f23309224cee59c2d6b194c75590",
+      "subset": "membrane",
+      "uncompressed_bytes": 5404,
+      "uncompressed_sha256": "b2243e29507b5d6b4aaed448050c38d8353185dffaa3a798200f7188771bc1de"
+    },
+    "protein-heavy-30id-xray-aqueous-v0": {
+      "bytes": 28868,
+      "compression": "xz",
+      "compression_preset": 6,
+      "kind": "score-table-set",
+      "path": "protein-heavy-30id-xray-aqueous/score-tables.json.xz",
+      "sha256": "30ac643de4629d151cd8235a636c18d245f7c3e246dbb885110708d772ecbefa",
+      "source_bytes": 959168,
+      "source_path": "reference-builds/tables/protein-heavy-30id-xray-aqueous-v0/score-tables.json",
+      "source_sha256": "ec05d0ac4e5847730a367a03da232c1ecb76fe4286bd8709eb21d58a623f6cd3",
+      "subset": "aqueous",
+      "uncompressed_bytes": 959227,
+      "uncompressed_sha256": "e074563cc19d9f7c150d35a3cf0b427c397261329672e93fe894877bee52b478"
+    },
+    "protein-heavy-30id-xray-membrane-v0": {
+      "bytes": 22036,
+      "compression": "xz",
+      "compression_preset": 6,
+      "kind": "score-table-set",
+      "path": "protein-heavy-30id-xray-membrane/score-tables.json.xz",
+      "sha256": "8e215b78f21679e2808fde40b9ba483ace6ed88e1ed60407506ff7ec9741c920",
+      "source_bytes": 773507,
+      "source_path": "reference-builds/tables/protein-heavy-30id-xray-membrane-v0/score-tables.json",
+      "source_sha256": "ebfeb33ecd968e58d34e08e09a946822c3baf16656b44c1bf2293e56acae53fc",
+      "subset": "membrane",
+      "uncompressed_bytes": 773567,
+      "uncompressed_sha256": "f5443f53bf3a6f9ff7aa9c21a91e28519c3437785f9abe1c12b5655f2754926a"
+    }
+  },
+  "created_at": "2026-05-28T03:31:55.377964Z",
+  "decoys": {
+    "aqueous": {
+      "decoy_count": 5454,
+      "decoys": "reference-builds/decoys/protein-heavy-30id-xray-aqueous-v0-pheat-torsion/decoys.jsonl",
+      "output_root": "reference-builds/decoys/protein-heavy-30id-xray-aqueous-v0-pheat-torsion",
+      "rejection_count": 168314
+    },
+    "membrane": {
+      "decoy_count": 554,
+      "decoys": "reference-builds/decoys/protein-heavy-30id-xray-membrane-v0-pheat-torsion/decoys.jsonl",
+      "output_root": "reference-builds/decoys/protein-heavy-30id-xray-membrane-v0-pheat-torsion",
+      "rejection_count": 18430
+    }
+  },
+  "default_ml_model": "pheat-ml-linear-aqueous-v0",
+  "default_score_table": "protein-heavy-30id-xray-aqueous-v0",
+  "features": {
+    "aqueous": {
+      "decoys": "reference-builds/decoys/protein-heavy-30id-xray-aqueous-v0-pheat-torsion/decoys.jsonl",
+      "feature_count": 27175,
+      "features": "reference-builds/features/v0/aqueous-features.jsonl",
+      "output": "reference-builds/features/v0/aqueous-features.jsonl"
+    },
+    "membrane": {
+      "decoys": "reference-builds/decoys/protein-heavy-30id-xray-membrane-v0-pheat-torsion/decoys.jsonl",
+      "feature_count": 2927,
+      "features": "reference-builds/features/v0/membrane-features.jsonl",
+      "output": "reference-builds/features/v0/membrane-features.jsonl"
+    }
+  },
+  "format": "pheat.packaged-score-assets",
+  "notes": [
+    "Packaged score/model JSON is committed as xz-compressed JSON using Python's standard-library lzma module.",
+    "Large reference snapshot, inventory, decoy, feature, and log artifacts remain external archive outputs.",
+    "These are initial v0 PHEAT-owned scoring assets; broader manual and scientific vetting is still expected before a later stable version.",
+    "Backbone and rotamer validation AUCs are diagnostic signals in this build and should not be treated as standalone rankers."
+  ],
+  "pheat_version": "0.1.0",
+  "provisional": true,
+  "selection": {
+    "aqueous": {
+      "holdout_count": 0,
+      "output_root": "reference-builds/sets/protein-heavy-30id-xray-aqueous-v0",
+      "selected_count": 21721
+    },
+    "membrane": {
+      "holdout_count": 0,
+      "output_root": "reference-builds/sets/protein-heavy-30id-xray-membrane-v0",
+      "selected_count": 2373
+    }
+  },
+  "source_run": {
+    "completed_at": "2026-05-28T03:31:55.377964Z",
+    "decoy_recipes": [
+      "sidechain-repack",
+      "torsion-near",
+      "torsion-medium",
+      "torsion-far",
+      "segment-near",
+      "segment-medium",
+      "compactness-contract",
+      "compactness-expand"
+    ],
+    "packaged_as_artifact_version": "v0",
+    "seed": 20260522,
+    "source_artifact_version": "v0",
+    "started_at": "2026-05-27T21:17:09.638237Z",
+    "summary": "reference-builds/runs/v0/summary.json",
+    "workers": 15
+  },
+  "source_snapshot": {
+    "metadata_entries": 254183,
+    "metadata_failure_count": 3,
+    "metadata_failures": [
+      {
+        "error": "entry metadata missing",
+        "pdb_id": "4M4C",
+        "scope": "entry",
+        "source": "rcsb-api"
+      },
+      {
+        "error": "entry metadata missing",
+        "pdb_id": "9KZM",
+        "scope": "entry",
+        "source": "rcsb-api"
+      },
+      {
+        "error": "entry metadata missing",
+        "pdb_id": "9MBW",
+        "scope": "entry",
+        "source": "rcsb-api"
+      }
+    ],
+    "snapshot_id": "rcsb-current-bcif",
+    "snapshot_root": "rcsb-current-bcif/rcsb-current-bcif"
+  },
+  "status": "initial",
+  "validation": {
+    "aqueous": {
+      "auc_lower_is_better": {
+        "generic_total": 0.9904563350462081,
+        "heavy-mm_total": 0.9349069753437294,
+        "pheat-backbone_total": 0.14885628181927196,
+        "pheat-dfire_total": 0.9240590326699905,
+        "pheat-geometry-integrity_total": 0.5657363382241575,
+        "pheat-goap_total": 0.9241211093777917,
+        "pheat-hbond_total": 0.8714443210507383,
+        "pheat-hydropathy_total": 0.8846349123962931,
+        "pheat-mj_total": 0.9496210206015153,
+        "pheat-rg_total": 0.6022945303599924,
+        "pheat-rotamer_total": 0.23646231848450716
+      },
+      "features_sha256": "95b1d8937129c16f4e679505c1815adf4c652f04470452e25fafdb39a06fa392",
+      "sample_count": 27175
+    },
+    "membrane": {
+      "auc_lower_is_better": {
+        "generic_total": 0.9828112900698441,
+        "heavy-mm_total": 0.8951638544942273,
+        "pheat-backbone_total": 0.12934471894249538,
+        "pheat-dfire_total": 0.9217893540598886,
+        "pheat-geometry-integrity_total": 0.5591712420567728,
+        "pheat-goap_total": 0.9219110601973769,
+        "pheat-hbond_total": 0.8740242590758549,
+        "pheat-hydropathy_total": 0.8164698069892792,
+        "pheat-mj_total": 0.9459761668956264,
+        "pheat-rg_total": 0.6313680834782397,
+        "pheat-rotamer_total": 0.21864203334443902
+      },
+      "features_sha256": "107fc2ba205078768648a28c7aa61a6e00d815d5d174aee60eb9927d65edee8d",
+      "sample_count": 2927
+    }
+  },
+  "version": 1
+}

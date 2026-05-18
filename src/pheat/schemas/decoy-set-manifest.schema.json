@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/decoy-set-manifest.schema.json",
+  "title": "PHEAT decoy set manifest row",
+  "type": "object",
+  "required": [
+    "record_id",
+    "decoy_id",
+    "native_record_id",
+    "recipe",
+    "seed",
+    "artifact_status",
+    "pheat_version",
+    "created_at"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "record_id": {"type": "string"},
+    "decoy_id": {"type": "string"},
+    "native_record_id": {"type": "string"},
+    "recipe": {"type": "string"},
+    "seed": {"type": "integer"},
+    "artifact_path": {"type": ["string", "null"]},
+    "artifact_sha256": {"type": ["string", "null"]},
+    "artifact_status": {"type": "string"},
+    "failure_reason": {"type": ["string", "null"]},
+    "pheat_version": {"type": "string"},
+    "created_at": {"type": "string"}
+  }
+}

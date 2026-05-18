@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/atom-structure.schema.json",
+  "title": "PHEAT Atom Structure",
+  "description": "Canonical JSON representation for a PHEAT atom structure.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "atom_scope",
+    "name",
+    "metadata",
+    "disulfide_bonds",
+    "atoms"
+  ],
+  "properties": {
+    "format": {
+      "const": "pheat.atom-structure"
+    },
+    "version": {
+      "const": 1
+    },
+    "atom_scope": {
+      "enum": [
+        "heavy",
+        "all"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "disulfide_bonds": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/disulfideBond"
+      }
+    },
+    "atoms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/atom"
+      }
+    },
+    "bonds": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bond"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "nullableInteger": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "nullableNumber": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "disulfideBond": {
+      "type": "object",
+      "required": [
+        "chain_id_1",
+        "resseq_1",
+        "icode_1",
+        "chain_id_2",
+        "resseq_2",
+        "icode_2",
+        "source"
+      ],
+      "properties": {
+        "chain_id_1": {
+          "type": "string"
+        },
+        "resseq_1": {
+          "type": "integer"
+        },
+        "icode_1": {
+          "type": "string"
+        },
+        "chain_id_2": {
+          "type": "string"
+        },
+        "resseq_2": {
+          "type": "integer"
+        },
+        "icode_2": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "bond": {
+      "type": "object",
+      "required": [
+        "atom_index_1",
+        "atom_index_2",
+        "source",
+        "length",
+        "order",
+        "metadata"
+      ],
+      "properties": {
+        "atom_index_1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "atom_index_2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source": {
+          "type": "string"
+        },
+        "length": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "order": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/$defs/metadata"
+        }
+      },
+      "additionalProperties": false
+    },
+    "atom": {
+      "type": "object",
+      "required": [
+        "name",
+        "element",
+        "x",
+        "y",
+        "z",
+        "resname",
+        "chain_id",
+        "resseq",
+        "icode",
+        "record_name",
+        "serial",
+        "altloc",
+        "occupancy",
+        "bfactor",
+        "charge",
+        "model",
+        "metadata"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "element": {
+          "type": "string"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        },
+        "resname": {
+          "type": "string"
+        },
+        "chain_id": {
+          "type": "string"
+        },
+        "resseq": {
+          "type": "integer"
+        },
+        "icode": {
+          "type": "string"
+        },
+        "record_name": {
+          "type": "string"
+        },
+        "serial": {
+          "$ref": "#/$defs/nullableInteger"
+        },
+        "altloc": {
+          "type": "string"
+        },
+        "occupancy": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "bfactor": {
+          "$ref": "#/$defs/nullableNumber"
+        },
+        "charge": {
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/nullableInteger"
+        },
+        "metadata": {
+          "$ref": "#/$defs/metadata"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

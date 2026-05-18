@@ -1,0 +1,50 @@
+corpus_id: pheat-edge-cases-demo
+version: v1
+description: Local archive demo for parser and manifest edge cases; not a scientific benchmark.
+source:
+  type: local_archive
+  format: mixed
+  source_root: ../../tests/fixtures
+  snapshot_label: local-fixture-demo
+  license_note: Local repository fixtures for parser edge cases.
+selection:
+  atom_domain: protein-heavy
+  experimental_methods:
+    - X-RAY DIFFRACTION
+  min_length: 1
+  max_length: 10000
+  sequence_identity:
+    method: not-applied-demo
+    threshold: 1.0
+  require_complete_backbone: false
+  allow_modified_residues: true
+  allow_altlocs: true
+  allow_insertion_codes: true
+geometry:
+  store_angles:
+    - omega
+    - tau
+    - theta
+  store_lengths: protein-heavy
+  store_chi: all
+  reconstruction_mode: pheat-default
+scoring:
+  profiles:
+    - generic
+  burial_methods:
+    - contacts
+decoys:
+  enabled: false
+  recipe: pheat-coordinate-noise-v1
+  n_per_native: 0
+  seed: 20260529
+outputs:
+  include_manifest: true
+  include_features: false
+  include_score_tables: false
+  include_decoys: false
+  compression: none
+provenance:
+  pheat_version: 0.1.0
+  created_by: PHEAT reference corpus template
+  notes: Use this only to exercise parsing/provenance edge cases.

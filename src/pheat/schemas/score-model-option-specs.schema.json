@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/score-model-option-specs.schema.json",
+  "title": "PHEAT Score Model Option Specs",
+  "description": "Public metadata wrapper for scorer option specifications keyed by model ID.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "models"
+  ],
+  "properties": {
+    "format": {
+      "const": "pheat.score-model-option-specs"
+    },
+    "version": {
+      "const": 1
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "name",
+            "type",
+            "default",
+            "required",
+            "description"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": {
+              "enum": [
+                "string",
+                "path",
+                "path-or-mapping",
+                "boolean",
+                "float",
+                "mapping"
+              ]
+            },
+            "default": true,
+            "required": {
+              "type": "boolean"
+            },
+            "description": {
+              "type": "string"
+            },
+            "choices": {
+              "type": "array"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

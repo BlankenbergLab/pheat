@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/scoring-options-validation.schema.json",
+  "title": "PHEAT Scoring Options Validation",
+  "description": "Validation result returned by validate_scoring_options.",
+  "type": "object",
+  "required": [
+    "ok",
+    "model",
+    "options",
+    "errors",
+    "warnings",
+    "require_executables"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "model": {
+      "type": "string"
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "require_executables": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

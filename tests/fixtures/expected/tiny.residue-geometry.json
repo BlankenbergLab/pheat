@@ -1,0 +1,52 @@
+{
+  "angle_units": "radians",
+  "chi_order": "chi1_to_chiN",
+  "disulfide_bonds": [],
+  "format": "pheat.residue-geometry-structure",
+  "metadata": {
+    "residue_count": 4,
+    "source": "atom_structure",
+    "source_name": "tiny.pdb",
+    "warnings": [
+      "A:1:ALA: duplicate atom CB; selected highest occupancy",
+      "B:1:HOH: heterogen has no extractable residue geometry",
+      "C:1:ZN: heterogen has no extractable residue geometry"
+    ]
+  },
+  "name": "tiny.pdb",
+  "residues": [
+    {
+      "chain_id": "A",
+      "chi": [],
+      "name": "ALA",
+      "phi": null,
+      "psi": 3.14159265359,
+      "resseq": 1
+    },
+    {
+      "chain_id": "A",
+      "chi": [],
+      "name": "GLY",
+      "phi": 3.14159265359,
+      "psi": null,
+      "resseq": 2
+    },
+    {
+      "chain_id": "B",
+      "chi": [],
+      "name": "HOH",
+      "phi": null,
+      "psi": null,
+      "resseq": 1
+    },
+    {
+      "chain_id": "C",
+      "chi": [],
+      "name": "ZN",
+      "phi": null,
+      "psi": null,
+      "resseq": 1
+    }
+  ],
+  "version": 1
+}

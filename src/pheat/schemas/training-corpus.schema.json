@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/training-corpus.schema.json",
+  "title": "PHEAT Training Corpus",
+  "description": "Selected nonredundant PHEAT training-corpus manifest.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "filters",
+    "entries"
+  ],
+  "properties": {
+    "format": {
+      "const": "pheat.training-corpus"
+    },
+    "version": {
+      "const": 1
+    },
+    "artifact_id": {
+      "type": "string"
+    },
+    "artifact_version": {
+      "type": "string"
+    },
+    "artifact_label": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "filters": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "holdout_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

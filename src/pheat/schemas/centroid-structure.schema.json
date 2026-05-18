@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/centroid-structure.schema.json",
+  "title": "PHEAT Centroid Structure",
+  "description": "Canonical JSON representation for centroid-reduced structures.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "name",
+    "metadata",
+    "centroids"
+  ],
+  "properties": {
+    "format": {
+      "const": "pheat.centroid-structure"
+    },
+    "version": {
+      "const": 1
+    },
+    "name": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "centroids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/centroid"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "centroid": {
+      "type": "object",
+      "required": [
+        "name",
+        "x",
+        "y",
+        "z",
+        "resname",
+        "chain_id",
+        "resseq",
+        "atom_names",
+        "metadata"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        },
+        "resname": {
+          "type": "string"
+        },
+        "chain_id": {
+          "type": "string"
+        },
+        "resseq": {
+          "type": "integer"
+        },
+        "atom_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/metadata"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "arxiv-2507-08955",
+      "name": "Quantum Algorithm for Protein Structure Prediction Using the Face-Centered Cubic Lattice",
+      "type": "paper",
+      "urls": [
+        "https://arxiv.org/abs/2507.08955"
+      ],
+      "citation": "Li et al. arXiv:2507.08955, 2025",
+      "license_note": "Use paper metadata and public PDB identifiers; do not vendor paper figures as package data."
+    },
+    {
+      "id": "zhou-zhou-2002-dfire",
+      "name": "DFIRE statistical potential",
+      "type": "statistical-potential",
+      "urls": [
+        "https://pubmed.ncbi.nlm.nih.gov/12381853/"
+      ],
+      "citation": "Zhou H, Zhou Y. Protein Science. 2002;11(11):2714-2726.",
+      "license_note": "Implementation currently uses the bundled pheat-dfire approximation; original DFIRE parameter tables are not vendored or redistributed."
+    },
+    {
+      "id": "engh-huber-1991",
+      "name": "Accurate bond and angle parameters for X-ray protein structure refinement",
+      "type": "protein-geometry-reference",
+      "urls": [
+        "https://doi.org/10.1107/S0108767391001071"
+      ],
+      "citation": "Engh RA, Huber R. Acta Crystallographica Section A. 1991;47:392-400.",
+      "license_note": "Used as literature context for idealized protein bond lengths and angles; no parameter table is vendored."
+    },
+    {
+      "id": "wwpdb-ccd",
+      "name": "wwPDB Chemical Component Dictionary",
+      "type": "chemical-component-reference",
+      "downloadable": false,
+      "urls": [
+        "https://www.wwpdb.org/data/ccd",
+        "https://files.rcsb.org/ligands/download/SEC.cif",
+        "https://files.rcsb.org/ligands/download/PYL.cif",
+        "https://files.rcsb.org/ligands/download/MSE.cif",
+        "https://files.rcsb.org/ligands/download/HYP.cif",
+        "https://files.rcsb.org/ligands/download/LYZ.cif",
+        "https://files.rcsb.org/ligands/download/SEP.cif",
+        "https://files.rcsb.org/ligands/download/TPO.cif",
+        "https://files.rcsb.org/ligands/download/PTR.cif",
+        "https://files.rcsb.org/ligands/download/PCA.cif"
+      ],
+      "citation": "wwPDB Chemical Component Dictionary; Westbrook JD, Shao C, Feng Z, Zhuravleva M, Velankar S, Young J. Bioinformatics. 2015;31(8):1274-1278. doi:10.1093/bioinformatics/btu789. Component definition CIFs accessed from RCSB PDB on 2026-05-19.",
+      "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "license_note": "PDB archive data files and RCSB PDB programmatic data are distributed under CC0 1.0. The listed component CIF files were consulted as reference data for component IDs, parent relationships, atom names, connectivity, and rounded idealized geometry. No CCD CIF files are vendored, redistributed, or packaged with PHEAT; the implementation contains derived hand-maintained residue templates and does not imply wwPDB/RCSB endorsement."
+    },
+    {
+      "id": "wwpdb-ccd-full",
+      "name": "wwPDB Chemical Component Dictionary full mmCIF",
+      "type": "chemical-component-reference",
+      "downloadable": true,
+      "filename": "components.cif.gz",
+      "urls": [
+        "https://files.wwpdb.org/pub/pdb/data/monomers/components.cif.gz"
+      ],
+      "estimated_bytes": 116061023,
+      "citation": "wwPDB Chemical Component Dictionary full components.cif.gz. File size and headers checked 2026-05-21.",
+      "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "license_note": "PDB archive data files and RCSB PDB programmatic data are distributed under CC0 1.0. PHEAT can download this file into a user cache for geometry-table generation, but it is not vendored, redistributed, or packaged with PHEAT."
+    },
+    {
+      "id": "rcsb-ccd-bcif",
+      "name": "RCSB CCD compact atom/bond BinaryCIF subsets",
+      "type": "chemical-component-reference",
+      "downloadable": true,
+      "files": [
+        {
+          "filename": "cca.bcif",
+          "url": "https://models.rcsb.org/cca.bcif",
+          "estimated_bytes": 15069388,
+          "description": "CCD atom subset: atom_id, comp_id, charge, and pdbx_stereo_config."
+        },
+        {
+          "filename": "ccb.bcif",
+          "url": "https://models.rcsb.org/ccb.bcif",
+          "estimated_bytes": 20983810,
+          "description": "CCD bond subset: atom_id_1, atom_id_2, comp_id, protonation variant, aromatic/stereo flags, and value_order."
+        }
+      ],
+      "urls": [
+        "https://models.rcsb.org/cca.bcif",
+        "https://models.rcsb.org/ccb.bcif",
+        "https://www.rcsb.org/docs/programmatic-access/file-download-services"
+      ],
+      "citation": "RCSB PDB File Download Services, Chemical Component Dictionary BinaryCIF atom and bond subsets. File sizes checked 2026-05-21.",
+      "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "license_note": "RCSB CCD BinaryCIF subsets are compact CC0 reference data for atom/bond connectivity and Mol* ModelServer workflows. They do not contain all full CCD geometry fields used by PHEAT to derive bond lengths and angles."
+    },
+    {
+      "id": "bondi-1964-vdw-radii",
+      "name": "van der Waals Volumes and Radii",
+      "type": "van-der-waals-radius-reference",
+      "urls": [
+        "https://doi.org/10.1021/j100785a001"
+      ],
+      "citation": "Bondi A. Journal of Physical Chemistry. 1964;68(3):441-451.",
+      "license_note": "Used as literature context for common van der Waals radii; current scoring uses approximate built-in radii."
+    },
+    {
+      "id": "ciaaw-standard-atomic-weights-2024",
+      "name": "CIAAW Standard Atomic Weights 2024",
+      "type": "atomic-mass-reference",
+      "downloadable": false,
+      "urls": [
+        "https://www.ciaaw.org/atomic-weights.htm",
+        "https://ciaaw.org/impressum.htm"
+      ],
+      "citation": "Commission on Isotopic Abundances and Atomic Weights. Standard Atomic Weights 2024. Accessed 2026-05-19.",
+      "license_note": "CIAAW/IUPAC website content is copyrighted and has attribution conditions for republication, reproduction, and electronic dissemination; commercial use requires contacting the CIAAW Secretariat. PHEAT does not download, vendor, redistribute, or package CIAAW tables. The radius-of-gyration implementation contains a small attributed representative atomic-mass table derived from standard atomic-weight references for center-of-mass weighting."
+    },
+    {
+      "id": "nist-atomic-weights",
+      "name": "NIST Atomic Weights and Isotopic Compositions with Relative Atomic Masses",
+      "type": "atomic-mass-reference",
+      "downloadable": false,
+      "urls": [
+        "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-relative-atomic-masses",
+        "https://www.nist.gov/open/copyright-fair-use-and-licensing-statements-srd-data-software-and-technical-series-publications",
+        "https://www.nist.gov/copyrights-disclaimers"
+      ],
+      "citation": "Coursey JS, Schwab DJ, Tsai JJ, Dragoset RA. NIST Atomic Weights and Isotopic Compositions with Relative Atomic Masses. NIST Physical Measurement Laboratory. Accessed 2026-05-19.",
+      "license_note": "NIST notes that this database compiles atomic weights from published CIAAW and related sources for user convenience and is not a NIST critical evaluation. NIST Standard Reference Data and other NIST works can have different copyright/licensing terms. PHEAT uses this as a reference and citation source only; no NIST atomic-weight data files are downloaded, vendored, redistributed, or packaged."
+    },
+    {
+      "id": "zhou-skolnick-2011-goap",
+      "name": "GOAP orientation-dependent all-atom potential",
+      "type": "statistical-potential",
+      "urls": [
+        "https://doi.org/10.1016/j.bpj.2011.09.012"
+      ],
+      "citation": "Zhou H, Skolnick J. Biophysical Journal. 2011;101(8):2043-2052.",
+      "license_note": "Implementation currently uses the bundled pheat-goap orientation approximation; original GOAP tables are not vendored or redistributed."
+    },
+    {
+      "id": "miyazawa-jernigan-contact-potentials",
+      "name": "Miyazawa-Jernigan residue contact potentials",
+      "type": "statistical-potential",
+      "urls": [
+        "https://doi.org/10.1021/ma00145a039"
+      ],
+      "citation": "Miyazawa S, Jernigan RL. Macromolecules. 1985;18(3):534-552.",
+      "license_note": "PHEAT builds pheat-mj as a PHEAT-generated MJ-style table from user-selected corpora; original MJ parameter tables are not vendored or redistributed."
+    },
+    {
+      "id": "kyte-doolittle-hydropathy",
+      "name": "Kyte-Doolittle hydropathy scale",
+      "type": "hydropathy-scale-reference",
+      "urls": [
+        "https://doi.org/10.1016/0022-2836(82)90515-0",
+        "https://web.expasy.org/protscale/pscale/Hphob.Doolittle.html"
+      ],
+      "citation": "Kyte J, Doolittle RF. Journal of Molecular Biology. 1982;157(1):105-132.",
+      "license_note": "Used as the documented default hydropathy scale for pheat-hydropathy; no external data file is downloaded or redistributed."
+    },
+    {
+      "id": "freesasa",
+      "name": "FreeSASA",
+      "type": "sasa-engine",
+      "urls": [
+        "https://freesasa.github.io/",
+        "https://doi.org/10.12688/f1000research.7931.1"
+      ],
+      "citation": "Mitternacht S. F1000Research. 2016;5:189.",
+      "license": "MIT",
+      "license_note": "Supported SASA backend for `--burial-method sasa`; PHEAT does not vendor FreeSASA source or binaries."
+    },
+    {
+      "id": "zhang-lab-decoys",
+      "name": "Zhang Lab protein decoy datasets",
+      "type": "decoy-dataset-reference",
+      "urls": [
+        "https://seq2fun.dcmb.med.umich.edu/decoys/"
+      ],
+      "citation": "Zhang Lab decoy dataset download page. Accessed as an external benchmark reference.",
+      "license_note": "External decoy payloads are not vendored, redistributed, or packaged with PHEAT."
+    },
+    {
+      "id": "casp-prediction-center-downloads",
+      "name": "CASP Prediction Center download area",
+      "type": "decoy-dataset-reference",
+      "urls": [
+        "https://predictioncenter.org/download_area/"
+      ],
+      "citation": "CASP Prediction Center download area. Accessed as an external benchmark reference.",
+      "license_note": "External CASP payloads are not vendored, redistributed, or packaged with PHEAT; users should follow CASP data-use terms."
+    },
+    {
+      "id": "openmm",
+      "name": "OpenMM",
+      "type": "molecular-mechanics-engine",
+      "urls": [
+        "https://docs.openmm.org/latest/userguide/application/02_running_sims.html"
+      ],
+      "citation": "Eastman et al. PLoS Computational Biology. 2017;13(7):e1005659.",
+      "license_note": "Use through optional conda-forge dependency."
+    },
+    {
+      "id": "ambertools",
+      "name": "AmberTools",
+      "type": "molecular-mechanics-engine",
+      "urls": [
+        "https://ambermd.org/AmberTools.php",
+        "https://anaconda.org/conda-forge/ambertools"
+      ],
+      "citation": "AmberTools suite. Used through external AmberTools executables such as tleap and sander.",
+      "license": "GPL-3.0-or-later AND LGPL-3.0-or-later AND BSD-3-Clause AND MIT (conda-forge package expression)",
+      "license_note": "AmberTools is not vendored, redistributed, or packaged with PHEAT. The ambertools-sander scorer shells out to user-installed AmberTools executables when available."
+    },
+    {
+      "id": "gromacs",
+      "name": "GROMACS",
+      "type": "molecular-mechanics-engine",
+      "urls": [
+        "https://manual.gromacs.org/current/",
+        "https://manual.gromacs.org/current/user-guide/force-fields.html",
+        "https://anaconda.org/conda-forge/gromacs"
+      ],
+      "citation": "GROMACS molecular simulation suite. Used through external gmx executables for optional topology preparation, rerun/minimization energy checks, and validation metrics.",
+      "license": "LGPL-2.1-or-later (conda-forge package metadata)",
+      "license_note": "GROMACS is not vendored, redistributed, or packaged with PHEAT. The gromacs-mdrun scorer shells out to user-installed gmx, pdb2gmx, grompp, mdrun, energy, and optional analysis commands when available."
+    },
+    {
+      "id": "amber-ff14sb",
+      "name": "AMBER ff14SB force field",
+      "type": "force-field",
+      "urls": [
+        "https://doi.org/10.1021/acs.jctc.5b00255"
+      ],
+      "citation": "Maier et al. Journal of Chemical Theory and Computation. 2015;11(8):3696-3713.",
+      "license_note": "Use through OpenMM force-field distribution where applicable."
+    },
+    {
+      "id": "amber-ff19sb",
+      "name": "AMBER ff19SB force field",
+      "type": "force-field",
+      "urls": [
+        "https://ambermd.org/AmberModels_proteins.php",
+        "https://manual.gromacs.org/current/user-guide/force-fields.html"
+      ],
+      "citation": "Tian et al. Journal of Chemical Theory and Computation. 2020;16(1):528-552. Used through user-installed GROMACS force-field files where available.",
+      "license_note": "PHEAT does not vendor AMBER ff19SB parameters; the gromacs-mdrun path relies on the user's GROMACS installation."
+    },
+    {
+      "id": "dunbrack-rotamers",
+      "name": "Dunbrack backbone-dependent rotamer library",
+      "type": "rotamer-library",
+      "urls": [
+        "https://doi.org/10.1016/j.str.2011.03.019"
+      ],
+      "citation": "Shapovalov MV, Dunbrack RL. Structure. 2011;19(6):844-858.",
+      "license_note": "Current implementation uses fixed built-in fallback chi defaults; exact rotamer tables should be fetched or vendored only after license review."
+    },
+    {
+      "id": "cdl-berkholz-backbone-geometry",
+      "name": "Conformation-dependent protein backbone geometry literature",
+      "type": "protein-geometry-reference",
+      "downloadable": false,
+      "urls": [
+        "https://journals.iucr.org/d/issues/2010/12/00/kw5028/index.html"
+      ],
+      "citation": "Berkholz DS, Shapovalov MV, Dunbrack RL Jr, Karplus PA. Conformation dependence of backbone geometry in proteins. Acta Crystallographica Section D. 2010.",
+      "license_note": "Literature reference for context-dependent protein backbone geometry. PHEAT does not vendor CDL tables from this source."
+    },
+    {
+      "id": "cdl-phenix-v12",
+      "name": "Phenix conformation-dependent library v1.2 reference",
+      "type": "protein-geometry-reference",
+      "downloadable": false,
+      "urls": [
+        "https://journals.iucr.org/d/issues/2016/01/00/rr5114/"
+      ],
+      "citation": "Moriarty NW, Tronrud DE, Adams PD, Karplus PA. A new default restraint library for the protein backbone in Phenix: a conformation-dependent geometry goes mainstream. Acta Crystallographica Section D. 2016.",
+      "license_note": "Reference for official CDL use in Phenix. PHEAT currently uses PHEAT-generated geometry tables and does not vendor the official CDL."
+    },
+    {
+      "id": "cctbx-cdl-implementation",
+      "name": "CCTBX conformation-dependent library implementation",
+      "type": "protein-geometry-reference",
+      "downloadable": false,
+      "urls": [
+        "https://cctbx.github.io/mmtbx/mmtbx.html"
+      ],
+      "citation": "CCTBX mmtbx conformation_dependent_library implementation documentation.",
+      "license_note": "Optional implementation reference for future CDL import. PHEAT does not vendor CCTBX CDL data or code in this pass."
+    },
+    {
+      "id": "rcsb-search-api-schema",
+      "name": "RCSB Search API schemas",
+      "type": "api-schema-reference",
+      "downloadable": false,
+      "urls": [
+        "https://search.rcsb.org/openapi.json",
+        "https://search.rcsb.org/rcsbsearch/v2/metadata/schema"
+      ],
+      "citation": "RCSB PDB Search API and searchable metadata schema. Accessed transiently by the PHEAT archive corpus utility when schema provenance is requested.",
+      "license_note": "PHEAT does not vendor, redistribute, or package these schema documents. The Search API OpenAPI document declares Apache 2.0 in its info.license field; RCSB programmatic API data are covered by the RCSB usage policy and its external-resource caveats."
+    }
+  ]
+}

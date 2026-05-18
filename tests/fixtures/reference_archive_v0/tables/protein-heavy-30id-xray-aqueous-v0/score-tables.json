@@ -1,0 +1,21 @@
+{
+  "artifact_id": "protein-heavy-30id-xray-aqueous",
+  "artifact_label": "protein-heavy-30id-xray-aqueous-v0",
+  "artifact_version": "v0",
+  "default_profile": "protein-heavy-30id-xray-aqueous-contacts",
+  "format": "pheat.score-table-set",
+  "metadata": {
+    "lineage": {
+      "parents": [
+        "reference-builds/sets/protein-heavy-30id-xray-aqueous-v0"
+      ]
+    },
+    "training_set": "reference-builds/sets/protein-heavy-30id-xray-aqueous-v0"
+  },
+  "profiles": {
+    "protein-heavy-30id-xray-aqueous-contacts": {
+      "models": {}
+    }
+  },
+  "version": 1
+}

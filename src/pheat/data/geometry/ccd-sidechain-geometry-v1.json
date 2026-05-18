@@ -1,0 +1,1456 @@
+{
+  "artifact_id": "ccd-sidechain-geometry",
+  "artifact_label": "ccd-sidechain-geometry-v1",
+  "artifact_version": "v1",
+  "created_at": "2026-05-21T18:07:24.051445Z",
+  "default_profile": "ccd-sidechains",
+  "format": "pheat.geometry-table-set",
+  "metadata": {
+    "ccd_bcif_dir": null,
+    "ccd_dir": null,
+    "ccd_full": "https://files.wwpdb.org/pub/pdb/data/monomers/components.cif.gz",
+    "provenance": {
+      "command_args": [
+        "geometry",
+        "tables",
+        "build-sidechain-ccd",
+        "--ccd-full",
+        "components.cif.gz",
+        "--output-root",
+        "derived/ccd-sidechains",
+        "--table-set-id",
+        "ccd-sidechain-geometry",
+        "--table-set-version",
+        "v1"
+      ],
+      "pheat_version": "0.1.0"
+    },
+    "residue_count": 29,
+    "source": "wwpdb-ccd-full",
+    "warnings": []
+  },
+  "pheat_version": "0.1.0",
+  "profiles": {
+    "ccd-sidechains": {
+      "backbone": {},
+      "metadata": {
+        "kind": "sidechains",
+        "placement_order_source": "pheat-template-order",
+        "source": "wwpdb-ccd-full"
+      },
+      "sidechains": {
+        "residues": {
+          "ALA": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": []
+          },
+          "ARG": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 113.42200376130617,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5259728044758942,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 111.75999795794188,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.5221530803437577,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 111.9263994381031,
+                "atom": "NE",
+                "dihedral": "chi3",
+                "element": "N",
+                "length": 1.4601760167870204,
+                "parent": "CD",
+                "previous": "CB"
+              },
+              {
+                "anchor": "CD",
+                "angle": 124.58061024722475,
+                "atom": "CZ",
+                "dihedral": "chi4",
+                "element": "C",
+                "length": 1.328153982036722,
+                "parent": "NE",
+                "previous": "CG"
+              },
+              {
+                "anchor": "NE",
+                "angle": 120.39364987776757,
+                "atom": "NH1",
+                "dihedral": 0.0,
+                "element": "N",
+                "length": 1.3245535096778926,
+                "parent": "CZ",
+                "previous": "CD"
+              },
+              {
+                "anchor": "NE",
+                "angle": 119.80866458673663,
+                "atom": "NH2",
+                "dihedral": 180.0,
+                "element": "N",
+                "length": 1.3253003433184418,
+                "parent": "CZ",
+                "previous": "CD"
+              }
+            ]
+          },
+          "ASN": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 116.70061284064533,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.4874141992061258,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 125.04567660136432,
+                "atom": "OD1",
+                "dihedral": "chi2",
+                "element": "O",
+                "length": 1.222167746260719,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 112.28598020178228,
+                "atom": "ND2",
+                "dihedral": [
+                  "chi2",
+                  180.0
+                ],
+                "element": "N",
+                "length": 1.3504240074880194,
+                "parent": "CG",
+                "previous": "CA"
+              }
+            ]
+          },
+          "ASP": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 112.54588725148312,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5311374856622118,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 118.40433779559065,
+                "atom": "OD1",
+                "dihedral": "chi2",
+                "element": "O",
+                "length": 1.2545664589809535,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 118.39247134025787,
+                "atom": "OD2",
+                "dihedral": [
+                  "chi2",
+                  180.0
+                ],
+                "element": "O",
+                "length": 1.2529429356519004,
+                "parent": "CG",
+                "previous": "CA"
+              }
+            ]
+          },
+          "CYS": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 115.54671064865923,
+                "atom": "SG",
+                "dihedral": "chi1",
+                "element": "S",
+                "length": 1.8185848894126477,
+                "parent": "CB",
+                "previous": "N"
+              }
+            ]
+          },
+          "GLN": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 112.0202684416914,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.558115528450955,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 114.28517707904858,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.5117423722314574,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 120.19970926267293,
+                "atom": "OE1",
+                "dihedral": "chi3",
+                "element": "O",
+                "length": 1.2200413927404241,
+                "parent": "CD",
+                "previous": "CB"
+              },
+              {
+                "anchor": "CG",
+                "angle": 116.60375999472082,
+                "atom": "NE2",
+                "dihedral": [
+                  "chi3",
+                  180.0
+                ],
+                "element": "N",
+                "length": 1.33467636526613,
+                "parent": "CD",
+                "previous": "CB"
+              }
+            ]
+          },
+          "GLU": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 113.43791657983236,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5178188297685586,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 113.49054404937715,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.521190652088028,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 119.46033992076994,
+                "atom": "OE1",
+                "dihedral": "chi3",
+                "element": "O",
+                "length": 1.2528084450545498,
+                "parent": "CD",
+                "previous": "CB"
+              },
+              {
+                "anchor": "CG",
+                "angle": 118.02003610295675,
+                "atom": "OE2",
+                "dihedral": [
+                  "chi3",
+                  180.0
+                ],
+                "element": "O",
+                "length": 1.2491929394613113,
+                "parent": "CD",
+                "previous": "CB"
+              }
+            ]
+          },
+          "GLY": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": []
+          },
+          "HIS": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 113.99334430384602,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.4974184451915882,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 122.54686970809082,
+                "atom": "ND1",
+                "dihedral": "chi2",
+                "element": "N",
+                "length": 1.378707365614618,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 131.22527086241288,
+                "atom": "CD2",
+                "dihedral": [
+                  "chi2",
+                  180.0
+                ],
+                "element": "C",
+                "length": 1.3536447096635074,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 109.2160183384687,
+                "atom": "CE1",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3219595303941816,
+                "parent": "ND1",
+                "previous": "CD2"
+              },
+              {
+                "anchor": "CG",
+                "angle": 107.17978247964605,
+                "atom": "NE2",
+                "dihedral": 0.0,
+                "element": "N",
+                "length": 1.373335355985564,
+                "parent": "CD2",
+                "previous": "ND1"
+              }
+            ]
+          },
+          "HYP": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 105.3339463568269,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.4584436910624965,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 106.50346792425981,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.504702960720157,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 108.88171538019105,
+                "atom": "OD1",
+                "dihedral": [
+                  "chi2",
+                  -120.0
+                ],
+                "element": "O",
+                "length": 1.4225754813014302,
+                "parent": "CG",
+                "previous": "CA"
+              }
+            ]
+          },
+          "ILE": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 110.33609491958997,
+                "atom": "CG1",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5377984263225122,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CA",
+                "angle": 110.28761924851122,
+                "atom": "CG2",
+                "dihedral": [
+                  "chi1",
+                  120.0
+                ],
+                "element": "C",
+                "length": 1.5321227104902535,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 113.05754421771167,
+                "atom": "CD1",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.5296957213772966,
+                "parent": "CG1",
+                "previous": "CA"
+              }
+            ]
+          },
+          "LEU": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 121.20608433769206,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.526195924512969,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 108.55012877533532,
+                "atom": "CD1",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.5524107059666914,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 108.46582866731931,
+                "atom": "CD2",
+                "dihedral": [
+                  "chi2",
+                  120.0
+                ],
+                "element": "C",
+                "length": 1.549164290835546,
+                "parent": "CG",
+                "previous": "CA"
+              }
+            ]
+          },
+          "LYS": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 114.82978399114447,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5148693012930183,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 110.74381871389585,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.5307543891820083,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 110.17723554164104,
+                "atom": "CE",
+                "dihedral": "chi3",
+                "element": "C",
+                "length": 1.5384891939821999,
+                "parent": "CD",
+                "previous": "CB"
+              },
+              {
+                "anchor": "CD",
+                "angle": 106.51751275318797,
+                "atom": "NZ",
+                "dihedral": "chi4",
+                "element": "N",
+                "length": 1.480464116417549,
+                "parent": "CE",
+                "previous": "CG"
+              }
+            ]
+          },
+          "LYZ": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 113.40598325723275,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5232153491873706,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 112.43410612468061,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.515380150325323,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 110.69806102331171,
+                "atom": "CE",
+                "dihedral": "chi3",
+                "element": "C",
+                "length": 1.5234126164634467,
+                "parent": "CD",
+                "previous": "CB"
+              },
+              {
+                "anchor": "CD",
+                "angle": 109.02098793958737,
+                "atom": "NZ",
+                "dihedral": "chi4",
+                "element": "N",
+                "length": 1.499111069934444,
+                "parent": "CE",
+                "previous": "CG"
+              },
+              {
+                "anchor": "CG",
+                "angle": 98.63354485593807,
+                "atom": "OH",
+                "dihedral": [
+                  "chi3",
+                  -120.0
+                ],
+                "element": "O",
+                "length": 1.448359761937621,
+                "parent": "CD",
+                "previous": "CB"
+              }
+            ]
+          },
+          "MET": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 116.36061647980327,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5419484427178485,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 115.01556609856725,
+                "atom": "SD",
+                "dihedral": "chi2",
+                "element": "S",
+                "length": 1.7713077090104932,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 100.14437556786858,
+                "atom": "CE",
+                "dihedral": "chi3",
+                "element": "C",
+                "length": 1.8856335805240672,
+                "parent": "SD",
+                "previous": "CB"
+              }
+            ]
+          },
+          "MSE": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 114.04030907142649,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5205071522357272,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 112.73128856710547,
+                "atom": "SE",
+                "dihedral": "chi2",
+                "element": "SE",
+                "length": 1.8034552947051394,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 100.8325623058666,
+                "atom": "CE",
+                "dihedral": "chi3",
+                "element": "C",
+                "length": 1.791777329915745,
+                "parent": "SE",
+                "previous": "CB"
+              }
+            ]
+          },
+          "PCA": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 101.09482741254581,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5112094494146062,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 102.85038166717631,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.5331839419978268,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 124.96123728932902,
+                "atom": "OE",
+                "dihedral": "chi3",
+                "element": "O",
+                "length": 1.2503387540982644,
+                "parent": "CD",
+                "previous": "CB"
+              }
+            ]
+          },
+          "PHE": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 114.01398405122055,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5072849763730785,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 120.78951670882428,
+                "atom": "CD1",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.394765571700135,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 120.52393880821967,
+                "atom": "CD2",
+                "dihedral": [
+                  "chi2",
+                  180.0
+                ],
+                "element": "C",
+                "length": 1.3898366810528497,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 120.90253807852301,
+                "atom": "CE1",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3937392152049082,
+                "parent": "CD1",
+                "previous": "CD2"
+              },
+              {
+                "anchor": "CG",
+                "angle": 120.96917478483888,
+                "atom": "CE2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3875305402044318,
+                "parent": "CD2",
+                "previous": "CD1"
+              },
+              {
+                "anchor": "CD1",
+                "angle": 119.57187497714524,
+                "atom": "CZ",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3905635548222892,
+                "parent": "CE1",
+                "previous": "CD2"
+              }
+            ]
+          },
+          "PRO": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 104.38227804512103,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5181702803045547,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 106.80770559591379,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.525719174684507,
+                "parent": "CG",
+                "previous": "CA"
+              }
+            ]
+          },
+          "PTR": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 115.73651278854999,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5175206753122006,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 120.83263063385043,
+                "atom": "CD1",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.398579279125784,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 120.77216646465165,
+                "atom": "CD2",
+                "dihedral": [
+                  "chi2",
+                  180.0
+                ],
+                "element": "C",
+                "length": 1.403756745308813,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 121.12822171096457,
+                "atom": "CE1",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.4084818067692613,
+                "parent": "CD1",
+                "previous": "CD2"
+              },
+              {
+                "anchor": "CG",
+                "angle": 121.59108838802945,
+                "atom": "CE2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.408768611234648,
+                "parent": "CD2",
+                "previous": "CD1"
+              },
+              {
+                "anchor": "CD1",
+                "angle": 119.44935740213204,
+                "atom": "CZ",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.406313265243558,
+                "parent": "CE1",
+                "previous": "CD2"
+              },
+              {
+                "anchor": "CE1",
+                "angle": 118.49400900507533,
+                "atom": "OH",
+                "dihedral": 180.0,
+                "element": "O",
+                "length": 1.438250325916877,
+                "parent": "CZ",
+                "previous": "CD1"
+              },
+              {
+                "anchor": "CZ",
+                "angle": 125.89407502974893,
+                "atom": "P",
+                "dihedral": "chi3",
+                "element": "P",
+                "length": 1.5156272628849101,
+                "parent": "OH",
+                "previous": "CE1"
+              },
+              {
+                "anchor": "OH",
+                "angle": 113.40504715552763,
+                "atom": "O1P",
+                "dihedral": "chi4",
+                "element": "O",
+                "length": 1.4508080507082952,
+                "parent": "P",
+                "previous": "CZ"
+              },
+              {
+                "anchor": "OH",
+                "angle": 98.29121421084025,
+                "atom": "O2P",
+                "dihedral": [
+                  "chi4",
+                  120.0
+                ],
+                "element": "O",
+                "length": 1.455713227253226,
+                "parent": "P",
+                "previous": "CZ"
+              },
+              {
+                "anchor": "OH",
+                "angle": 109.58560414039796,
+                "atom": "O3P",
+                "dihedral": [
+                  "chi4",
+                  -120.0
+                ],
+                "element": "O",
+                "length": 1.471042487489739,
+                "parent": "P",
+                "previous": "CZ"
+              }
+            ]
+          },
+          "PYL": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 111.50402854000015,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5309934683074278,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 112.02660764933437,
+                "atom": "CD",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.5302290678195847,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 110.83978221114553,
+                "atom": "CE",
+                "dihedral": "chi3",
+                "element": "C",
+                "length": 1.530005882341631,
+                "parent": "CD",
+                "previous": "CB"
+              },
+              {
+                "anchor": "CD",
+                "angle": 108.78631807559563,
+                "atom": "NZ",
+                "dihedral": "chi4",
+                "element": "N",
+                "length": 1.4693117436405376,
+                "parent": "CE",
+                "previous": "CG"
+              },
+              {
+                "anchor": "CE",
+                "angle": 123.27190950629915,
+                "atom": "C2",
+                "dihedral": "chi5",
+                "element": "C",
+                "length": 1.3313620844834062,
+                "parent": "NZ",
+                "previous": "CD"
+              },
+              {
+                "anchor": "NZ",
+                "angle": 124.53953472359481,
+                "atom": "O2",
+                "dihedral": 0.0,
+                "element": "O",
+                "length": 1.2303406032477373,
+                "parent": "C2",
+                "previous": "CE"
+              },
+              {
+                "anchor": "NZ",
+                "angle": 113.97448085582715,
+                "atom": "CA2",
+                "dihedral": 180.0,
+                "element": "C",
+                "length": 1.5307632083375924,
+                "parent": "C2",
+                "previous": "CE"
+              },
+              {
+                "anchor": "C2",
+                "angle": 110.81098758853759,
+                "atom": "N2",
+                "dihedral": "chi6",
+                "element": "N",
+                "length": 1.47112372015408,
+                "parent": "CA2",
+                "previous": "NZ"
+              },
+              {
+                "anchor": "CA2",
+                "angle": 110.06203465021828,
+                "atom": "CE2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3316981639996406,
+                "parent": "N2",
+                "previous": "C2"
+              },
+              {
+                "anchor": "N2",
+                "angle": 109.7174838324825,
+                "atom": "CD2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.5308540100218577,
+                "parent": "CE2",
+                "previous": "CA2"
+              },
+              {
+                "anchor": "CE2",
+                "angle": 101.01751693272799,
+                "atom": "CG2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.5270946270614643,
+                "parent": "CD2",
+                "previous": "N2"
+              },
+              {
+                "anchor": "CD2",
+                "angle": 112.66226381368148,
+                "atom": "CB2",
+                "dihedral": 120.0,
+                "element": "C",
+                "length": 1.5297702441870156,
+                "parent": "CG2",
+                "previous": "CE2"
+              }
+            ]
+          },
+          "SEC": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 110.38803972602236,
+                "atom": "SE",
+                "dihedral": "chi1",
+                "element": "SE",
+                "length": 1.8769493866377944,
+                "parent": "CB",
+                "previous": "N"
+              }
+            ]
+          },
+          "SEP": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 107.60185828141063,
+                "atom": "OG",
+                "dihedral": "chi1",
+                "element": "O",
+                "length": 1.3924327631882254,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 117.82777917317458,
+                "atom": "P",
+                "dihedral": "chi2",
+                "element": "P",
+                "length": 1.5787593230128514,
+                "parent": "OG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "OG",
+                "angle": 108.7245425775065,
+                "atom": "O1P",
+                "dihedral": "chi3",
+                "element": "O",
+                "length": 1.464927984578078,
+                "parent": "P",
+                "previous": "CB"
+              },
+              {
+                "anchor": "OG",
+                "angle": 105.50325416025647,
+                "atom": "O2P",
+                "dihedral": [
+                  "chi3",
+                  120.0
+                ],
+                "element": "O",
+                "length": 1.4662025780907695,
+                "parent": "P",
+                "previous": "CB"
+              },
+              {
+                "anchor": "OG",
+                "angle": 109.65178322451625,
+                "atom": "O3P",
+                "dihedral": [
+                  "chi3",
+                  -120.0
+                ],
+                "element": "O",
+                "length": 1.4893606010634222,
+                "parent": "P",
+                "previous": "CB"
+              }
+            ]
+          },
+          "SER": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 110.29908375477929,
+                "atom": "OG",
+                "dihedral": "chi1",
+                "element": "O",
+                "length": 1.4108695900046864,
+                "parent": "CB",
+                "previous": "N"
+              }
+            ]
+          },
+          "THR": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 110.06512610340138,
+                "atom": "OG1",
+                "dihedral": "chi1",
+                "element": "O",
+                "length": 1.435211831054913,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CA",
+                "angle": 110.13912871469657,
+                "atom": "CG2",
+                "dihedral": [
+                  "chi1",
+                  120.0
+                ],
+                "element": "C",
+                "length": 1.537562681649112,
+                "parent": "CB",
+                "previous": "N"
+              }
+            ]
+          },
+          "TPO": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 110.87478930608121,
+                "atom": "OG1",
+                "dihedral": "chi1",
+                "element": "O",
+                "length": 1.390449567585965,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CA",
+                "angle": 111.69017730689244,
+                "atom": "CG2",
+                "dihedral": [
+                  "chi1",
+                  120.0
+                ],
+                "element": "C",
+                "length": 1.5287108948391788,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 116.32101715654932,
+                "atom": "P",
+                "dihedral": "chi2",
+                "element": "P",
+                "length": 1.5744332313566052,
+                "parent": "OG1",
+                "previous": "CA"
+              },
+              {
+                "anchor": "OG1",
+                "angle": 103.87365128450726,
+                "atom": "O1P",
+                "dihedral": "chi3",
+                "element": "O",
+                "length": 1.4546614726457847,
+                "parent": "P",
+                "previous": "CB"
+              },
+              {
+                "anchor": "OG1",
+                "angle": 105.46090301257483,
+                "atom": "O2P",
+                "dihedral": [
+                  "chi3",
+                  120.0
+                ],
+                "element": "O",
+                "length": 1.4580418375341637,
+                "parent": "P",
+                "previous": "CB"
+              },
+              {
+                "anchor": "OG1",
+                "angle": 107.465933486363,
+                "atom": "O3P",
+                "dihedral": [
+                  "chi3",
+                  -120.0
+                ],
+                "element": "O",
+                "length": 1.49012482698598,
+                "parent": "P",
+                "previous": "CB"
+              }
+            ]
+          },
+          "TRP": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 115.34743608565581,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5213392126675762,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 126.83321398250072,
+                "atom": "CD1",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.3601022020421851,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 126.88014087540328,
+                "atom": "CD2",
+                "dihedral": [
+                  "chi2",
+                  180.0
+                ],
+                "element": "C",
+                "length": 1.433858430947772,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 110.35198329631142,
+                "atom": "NE1",
+                "dihedral": 0.0,
+                "element": "N",
+                "length": 1.3753181450122791,
+                "parent": "CD1",
+                "previous": "CD2"
+              },
+              {
+                "anchor": "CG",
+                "angle": 107.21557244857735,
+                "atom": "CE2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.4119327179437389,
+                "parent": "CD2",
+                "previous": "CD1"
+              },
+              {
+                "anchor": "CE2",
+                "angle": 118.89248761836281,
+                "atom": "CE3",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.4016839872096676,
+                "parent": "CD2",
+                "previous": "CG"
+              },
+              {
+                "anchor": "CD2",
+                "angle": 122.6399773526178,
+                "atom": "CZ2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3999592851222493,
+                "parent": "CE2",
+                "previous": "CG"
+              },
+              {
+                "anchor": "CD2",
+                "angle": 118.61847819654666,
+                "atom": "CZ3",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.39767163525629,
+                "parent": "CE3",
+                "previous": "CE2"
+              },
+              {
+                "anchor": "CE2",
+                "angle": 117.46894393413966,
+                "atom": "CH2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.372114062314058,
+                "parent": "CZ2",
+                "previous": "CD2"
+              }
+            ]
+          },
+          "TYR": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 116.12570904059048,
+                "atom": "CG",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.5088416086521486,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CB",
+                "angle": 121.39008838821219,
+                "atom": "CD1",
+                "dihedral": "chi2",
+                "element": "C",
+                "length": 1.3952150371896062,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CB",
+                "angle": 122.617253118815,
+                "atom": "CD2",
+                "dihedral": [
+                  "chi2",
+                  180.0
+                ],
+                "element": "C",
+                "length": 1.4003399587243097,
+                "parent": "CG",
+                "previous": "CA"
+              },
+              {
+                "anchor": "CG",
+                "angle": 123.20466818650155,
+                "atom": "CE1",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3784324430308517,
+                "parent": "CD1",
+                "previous": "CD2"
+              },
+              {
+                "anchor": "CG",
+                "angle": 122.07532667579737,
+                "atom": "CE2",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.383592786913836,
+                "parent": "CD2",
+                "previous": "CD1"
+              },
+              {
+                "anchor": "CD1",
+                "angle": 119.31697370548629,
+                "atom": "CZ",
+                "dihedral": 0.0,
+                "element": "C",
+                "length": 1.3975324683169261,
+                "parent": "CE1",
+                "previous": "CD2"
+              },
+              {
+                "anchor": "CE1",
+                "angle": 120.39723234597423,
+                "atom": "OH",
+                "dihedral": 180.0,
+                "element": "O",
+                "length": 1.3748458095364726,
+                "parent": "CZ",
+                "previous": "CD1"
+              }
+            ]
+          },
+          "VAL": {
+            "placement_order_source": "pheat-template-order",
+            "source": "wwpdb-ccd-full",
+            "steps": [
+              {
+                "anchor": "CA",
+                "angle": 109.87086069668186,
+                "atom": "CG1",
+                "dihedral": "chi1",
+                "element": "C",
+                "length": 1.502893542470656,
+                "parent": "CB",
+                "previous": "N"
+              },
+              {
+                "anchor": "CA",
+                "angle": 110.88776232454181,
+                "atom": "CG2",
+                "dihedral": [
+                  "chi1",
+                  120.0
+                ],
+                "element": "C",
+                "length": 1.5231339402692112,
+                "parent": "CB",
+                "previous": "N"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version": 1
+}

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.tools.blankenberglab.org/schemas/radius-of-gyration-result.schema.json",
+  "title": "PHEAT Radius Of Gyration Result",
+  "description": "Canonical JSON representation for a PHEAT radius-of-gyration result.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "input",
+    "radius_of_gyration"
+  ],
+  "properties": {
+    "format": {
+      "const": "pheat.radius-of-gyration-result"
+    },
+    "version": {
+      "const": 1
+    },
+    "input": {
+      "type": "string"
+    },
+    "radius_of_gyration": {
+      "$ref": "#/$defs/radiusOfGyrationPayload"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "radiusOfGyrationPayload": {
+      "type": "object",
+      "required": [
+        "atom_count",
+        "atom_set",
+        "mode",
+        "units",
+        "values"
+      ],
+      "properties": {
+        "atom_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "atom_set": {
+          "enum": [
+            "all-heavy",
+            "all-atoms",
+            "backbone",
+            "ca"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "unweighted",
+            "mass-weighted",
+            "both"
+          ]
+        },
+        "units": {
+          "const": "angstrom"
+        },
+        "values": {
+          "type": "object",
+          "minProperties": 1,
+          "properties": {
+            "unweighted": {
+              "type": "number"
+            },
+            "mass_weighted": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "mass_source": {
+          "type": "string"
+        },
+        "unknown_elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

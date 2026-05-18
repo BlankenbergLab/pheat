@@ -1,0 +1,149 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+
+      - name: Read project version
+        id: project
+        run: |
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          version = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"version={version}", file=output)
+          PY
+
+      - name: Validate release tag
+        if: github.event_name == 'release'
+        run: |
+          set -euo pipefail
+
+          version="${{ steps.project.outputs.version }}"
+          tag="${GITHUB_REF_NAME}"
+          if [[ "${tag}" != "${version}" && "${tag}" != "v${version}" ]]; then
+            echo "Release tag ${tag} must match pyproject.toml version ${version} or v${version}." >&2
+            exit 1
+          fi
+
+          git fetch --quiet origin main:refs/remotes/origin/main
+          release_commit="$(git rev-list -n 1 "${tag}")"
+          if ! git merge-base --is-ancestor "${release_commit}" origin/main; then
+            echo "Release commit ${release_commit} is not contained in origin/main." >&2
+            exit 1
+          fi
+
+      - name: Build package
+        run: python -m build --sdist --wheel
+
+      - name: Check package metadata
+        run: python -m twine check --strict dist/*
+
+      - name: Smoke test built wheel
+        run: |
+          python -m venv /tmp/pheat-wheel-smoke
+          /tmp/pheat-wheel-smoke/bin/python -m pip install --upgrade pip
+          /tmp/pheat-wheel-smoke/bin/python -m pip install dist/*.whl
+          /tmp/pheat-wheel-smoke/bin/pheat --help
+          /tmp/pheat-wheel-smoke/bin/python - <<'PY'
+          import pheat
+          from pheat.examples import list_example_sets, load_example_manifest
+          from pheat.geometry_tables import list_packaged_geometry_tables
+          from pheat.schemas import available_schemas, load_schema
+          from pheat.sources import list_sources
+
+          assert pheat.__version__ != "0.0.0+unknown"
+          assert "arxiv-2507-08955" in list_example_sets()
+          assert load_example_manifest("arxiv-2507-08955")["examples"]
+          assert list_packaged_geometry_tables()
+          assert "atom-structure" in available_schemas()
+          assert load_schema("atom-structure")["$schema"]
+          assert list_sources()
+          PY
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: pheat-dist
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pheat
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: pheat-dist
+          path: dist
+
+      - name: Publish package distributions to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pheat
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: pheat-dist
+          path: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

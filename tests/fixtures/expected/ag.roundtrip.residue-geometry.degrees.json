@@ -1,0 +1,32 @@
+{
+  "angle_units": "degrees",
+  "chi_order": "chi1_to_chiN",
+  "disulfide_bonds": [],
+  "format": "pheat.residue-geometry-structure",
+  "metadata": {
+    "residue_count": 2,
+    "source": "atom_structure",
+    "source_name": "sequence:AG",
+    "warnings": []
+  },
+  "name": "sequence:AG",
+  "residues": [
+    {
+      "chain_id": "A",
+      "chi": [],
+      "name": "ALA",
+      "phi": null,
+      "psi": -44.999999999971,
+      "resseq": 1
+    },
+    {
+      "chain_id": "A",
+      "chi": [],
+      "name": "GLY",
+      "phi": -60.000000000009,
+      "psi": null,
+      "resseq": 2
+    }
+  ],
+  "version": 1
+}
