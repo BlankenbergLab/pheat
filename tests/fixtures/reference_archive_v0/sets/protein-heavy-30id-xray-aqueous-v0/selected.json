@@ -1,0 +1,9 @@
+{
+  "artifact_id": "protein-heavy-30id-xray-aqueous",
+  "artifact_label": "protein-heavy-30id-xray-aqueous-v0",
+  "artifact_version": "v0",
+  "format": "pheat.training-corpus",
+  "output_root": "reference-builds/sets/protein-heavy-30id-xray-aqueous-v0",
+  "selected_count": 1,
+  "version": 1
+}

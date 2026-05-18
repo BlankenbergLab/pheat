@@ -1,0 +1,61 @@
+{
+  "name": "diversity",
+  "description": "Additional examples spanning protein sizes, folds, heterogens, and classifications.",
+  "examples": [
+    {
+      "id": "1crn_crambin",
+      "pdb_id": "1CRN",
+      "classification": "small disulfide-rich protein",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "1ubq_ubiquitin",
+      "pdb_id": "1UBQ",
+      "classification": "compact mixed alpha/beta soluble protein",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "1vii_villin_headpiece",
+      "pdb_id": "1VII",
+      "classification": "all-alpha miniprotein",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "1ten_fibronectin_type_iii",
+      "pdb_id": "1TEN",
+      "classification": "all-beta domain",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "1mbn_myoglobin",
+      "pdb_id": "1MBN",
+      "classification": "heme-binding globular protein",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid", "heterogen_preservation"]
+    },
+    {
+      "id": "4hhb_hemoglobin",
+      "pdb_id": "4HHB",
+      "classification": "multichain heme protein",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid", "multichain"]
+    },
+    {
+      "id": "1c3w_bacteriorhodopsin",
+      "pdb_id": "1C3W",
+      "classification": "membrane protein",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "1brs_barnase_barstar",
+      "pdb_id": "1BRS",
+      "classification": "protein-protein complex",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid", "multichain"]
+    },
+    {
+      "id": "1aay_zinc_finger",
+      "pdb_id": "1AAY",
+      "classification": "metal-binding zinc finger",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid", "heterogen_preservation"]
+    }
+  ]
+}
+

@@ -1,0 +1,130 @@
+{
+  "name": "arxiv-2507-08955",
+  "description": "Protein and peptide examples named or labeled in arXiv:2507.08955.",
+  "source": "https://arxiv.org/abs/2507.08955",
+  "notes": [
+    "The figure-2 labels were read from the paper source/figure and should be curated further if exact chain/residue slices are needed.",
+    "Jun Qin integrin is described in the paper as not obtained from the PDB; this manifest records a placeholder requiring user-provided coordinates."
+  ],
+  "examples": [
+    {
+      "id": "2k2r_paxillin",
+      "pdb_id": "2K2R",
+      "label": "paxillin",
+      "expected_residue_count": 10,
+      "classification": "short helix",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "2mzx_ccr5_ecl2",
+      "pdb_id": "2MZX",
+      "label": "CCR5 ECL2 fragment",
+      "sequence": "QYQFWKNFQT",
+      "expected_residue_count": 10,
+      "classification": "short loop",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "1k43",
+      "pdb_id": "1K43",
+      "expected_residue_count": 14,
+      "classification": "short beta/loop",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "2knc",
+      "pdb_id": "2KNC",
+      "expected_residue_count": 15,
+      "classification": "short mixed",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "8t61",
+      "pdb_id": "8T61",
+      "expected_residue_count": 16,
+      "classification": "short mixed",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "8t63",
+      "pdb_id": "8T63",
+      "expected_residue_count": 16,
+      "classification": "short mixed",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "2ndc",
+      "pdb_id": "2NDC",
+      "expected_residue_count": 18,
+      "classification": "short helix/loop",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "2nde",
+      "pdb_id": "2NDE",
+      "expected_residue_count": 18,
+      "classification": "short helix/loop",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "2jof_trp_cage",
+      "pdb_id": "2JOF",
+      "label": "Trp-cage",
+      "expected_residue_count": 20,
+      "classification": "miniprotein mixed alpha/loop",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "6a8y",
+      "pdb_id": "6A8Y",
+      "expected_residue_count": 26,
+      "classification": "short mixed",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "1g04",
+      "pdb_id": "1G04",
+      "expected_residue_count": 26,
+      "classification": "short mixed",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "5awl_chignolin_mutant",
+      "pdb_id": "5AWL",
+      "label": "chignolin mutant",
+      "sequence": "YYDPETGTWY",
+      "expected_residue_count": 10,
+      "classification": "beta hairpin",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "4qxx_small_peptide",
+      "pdb_id": "4QXX",
+      "sequence": "GNLVS",
+      "expected_residue_count": 5,
+      "classification": "small peptide",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "2y29_reference",
+      "pdb_id": "2Y29",
+      "classification": "paper-cited peptide/protein reference",
+      "tests": ["fetch", "pdb_roundtrip", "score", "centroid"]
+    },
+    {
+      "id": "klvffa_quantum_sequence",
+      "sequence": "KLVFFA",
+      "expected_residue_count": 6,
+      "classification": "amyloid beta fragment quantum hardware sequence",
+      "tests": ["residue_geometry_reconstruction", "score", "centroid"]
+    },
+    {
+      "id": "jun_qin_integrin_15aa",
+      "expected_residue_count": 15,
+      "classification": "user-provided non-PDB integrin fragment",
+      "requires_user_coordinates": true,
+      "tests": ["manifest_only"]
+    }
+  ]
+}
+

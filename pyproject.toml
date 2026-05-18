@@ -1,0 +1,149 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pheat"
+version = "0.1.0"
+description = "Protein Heavy-atom Energy and Analysis Toolkit."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "PHEAT contributors" }]
+dependencies = [
+  "platformdirs",
+]
+
+[project.urls]
+Repository = "https://github.com/BlankenbergLab/pheat"
+Documentation = "https://pheat.tools.blankenberglab.org/"
+Issues = "https://github.com/BlankenbergLab/pheat/issues"
+
+[project.optional-dependencies]
+openmm = [
+  "openmm>=8.2; python_version >= '3.10'",
+  "pdbfixer==1.12.0; python_version >= '3.10'",
+]
+scientific = [
+  "freesasa>=2.2",
+  "msgpack",
+  "numpy",
+  "openmm>=8.2; python_version >= '3.10'",
+  "pdbfixer==1.12.0; python_version >= '3.10'",
+  "scipy",
+]
+training = [
+  "freesasa>=2.2",
+  "jsonschema",
+  "msgpack",
+  "numpy",
+  "pyyaml",
+  "scipy",
+]
+training-full = [
+  "freesasa>=2.2",
+  "jsonschema",
+  "msgpack",
+  "numpy",
+  "openmm>=8.2; python_version >= '3.10'",
+  "pdbfixer==1.12.0; python_version >= '3.10'",
+  "pyyaml",
+  "scipy",
+]
+notebook = [
+  "ipymolstar==0.1.0",
+  "ipywidgets",
+  "jupyterlab",
+  "jupyterlab_widgets",
+  "molviewspec==1.8.1",
+  "nbformat",
+]
+web = [
+  "fastapi",
+  "python-multipart",
+  "uvicorn",
+]
+dev = [
+  "build",
+  "coverage",
+  "fastapi",
+  "freesasa>=2.2",
+  "httpx",
+  "jsonschema",
+  "msgpack",
+  "mypy<2",
+  "nox",
+  "numpy",
+  "openmm>=8.2; python_version >= '3.10'",
+  "pdbfixer==1.12.0; python_version >= '3.10'",
+  "pyyaml",
+  "python-multipart",
+  "pytest",
+  "pytest-cov",
+  "ruff",
+  "scipy",
+  "tox",
+  "uvicorn",
+]
+all = [
+  "build",
+  "coverage",
+  "fastapi",
+  "freesasa>=2.2",
+  "httpx",
+  "ipymolstar==0.1.0",
+  "ipywidgets",
+  "jsonschema",
+  "jupyterlab",
+  "jupyterlab_widgets",
+  "molviewspec==1.8.1",
+  "msgpack",
+  "mypy<2",
+  "nbformat",
+  "nox",
+  "numpy",
+  "openmm>=8.2; python_version >= '3.10'",
+  "pdbfixer==1.12.0; python_version >= '3.10'",
+  "pyyaml",
+  "python-multipart",
+  "pytest",
+  "pytest-cov",
+  "ruff",
+  "scipy",
+  "tox",
+  "uvicorn",
+]
+
+[project.scripts]
+pheat = "pheat.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pheat = ["data/**/*.json", "data/**/*.json.xz", "schemas/**/*.json"]
+"pheat.schemas" = ["*.json"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["pheat"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.mypy]
+python_version = "3.9"
+files = ["src/pheat"]
+follow_imports = "skip"
+ignore_missing_imports = true
+warn_unused_configs = true
+check_untyped_defs = true

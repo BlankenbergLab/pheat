@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.dev/schemas/score-table-set.schema.json",
+  "title": "PHEAT Score Table Set",
+  "description": "Canonical JSON representation for trained PHEAT score-table models.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "default_profile",
+    "metadata",
+    "profiles"
+  ],
+  "properties": {
+    "format": {
+      "const": "pheat.score-table-set"
+    },
+    "version": {
+      "const": 1
+    },
+    "artifact_id": {
+      "type": "string"
+    },
+    "artifact_version": {
+      "type": "string"
+    },
+    "artifact_label": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "pheat_version": {
+      "type": "string"
+    },
+    "default_profile": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "metadata",
+          "models"
+        ],
+        "properties": {
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "models": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

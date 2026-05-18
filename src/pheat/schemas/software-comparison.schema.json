@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.dev/schemas/software-comparison.schema.json",
+  "title": "PHEAT software comparison record",
+  "type": "object",
+  "required": ["tool", "comparison_scope", "pheat_positioning"],
+  "additionalProperties": true,
+  "properties": {
+    "tool": {"type": "string"},
+    "version": {"type": ["string", "null"]},
+    "comparison_scope": {"type": "string"},
+    "pheat_positioning": {"type": "string"},
+    "not_a_replacement_for": {"type": "boolean"},
+    "notes": {"type": ["string", "array", "null"]}
+  }
+}

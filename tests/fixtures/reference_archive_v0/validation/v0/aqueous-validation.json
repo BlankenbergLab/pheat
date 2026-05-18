@@ -1,0 +1,7 @@
+{
+  "artifact_version": "v0",
+  "features": "reference-builds/features/v0/aqueous-features.jsonl",
+  "format": "pheat.reference-validation",
+  "output": "reference-builds/validation/v0/aqueous-validation.json",
+  "version": 1
+}

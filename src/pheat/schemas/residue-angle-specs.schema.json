@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.dev/schemas/residue-angle-specs.schema.json",
+  "title": "PHEAT Residue Angle Specs",
+  "description": "Public metadata wrapper for PHEAT residue-angle specification records.",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "specs"
+  ],
+  "properties": {
+    "format": {
+      "const": "pheat.residue-angle-specs"
+    },
+    "version": {
+      "const": 1
+    },
+    "specs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "residue_index",
+          "residue_number",
+          "residue_name",
+          "angle_name",
+          "category",
+          "angle_units",
+          "applies_to",
+          "terminal_position",
+          "coordinate_defined",
+          "required_atoms",
+          "optional_residue_geometry_field",
+          "source"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[0-9]+_(phi|psi|omega|tau|theta|chi[1-9][0-9]*)$"
+          },
+          "residue_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "residue_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "residue_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "residue_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "angle_name": {
+            "type": "string",
+            "pattern": "^(phi|psi|omega|tau|theta|chi[1-9][0-9]*)$"
+          },
+          "category": {
+            "enum": [
+              "backbone-dihedral",
+              "backbone-bond-angle",
+              "sidechain-dihedral"
+            ]
+          },
+          "angle_units": {
+            "enum": [
+              "radians",
+              "degrees"
+            ]
+          },
+          "applies_to": {
+            "enum": [
+              "residue",
+              "peptide-link-to-next"
+            ]
+          },
+          "terminal_position": {
+            "enum": [
+              "single-residue",
+              "n-terminal",
+              "internal",
+              "c-terminal"
+            ]
+          },
+          "coordinate_defined": {
+            "type": "boolean"
+          },
+          "required_atoms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "optional_residue_geometry_field": {
+            "type": "boolean"
+          },
+          "peptide_link_to_residue_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "peptide_link_to_residue_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

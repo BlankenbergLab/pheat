@@ -1,0 +1,433 @@
+{
+  "date": "2026-05-13",
+  "questions": [
+    {
+      "id": "energy_model",
+      "answer": "Knowledge-based plus molecular-mechanics-style scoring",
+      "user_note": "Enable both 1 and 2, obtain required source files and provide citations for needed potentials and chemical calculations."
+    },
+    {
+      "id": "interface",
+      "answer": "Python CLI/package"
+    },
+    {
+      "id": "torsions",
+      "answer": "Full side chains"
+    },
+    {
+      "id": "dependency_policy",
+      "answer": "Use dependencies",
+      "user_note": "Save copies of all plans, questions and answers in a local directory here. Also create local miniforge environments in current directory as needed for building, running, testing etc; there is a miniforge installation in home directory that can be used."
+    },
+    {
+      "id": "chemical_scope",
+      "answer": "Best-effort all PDB"
+    },
+    {
+      "id": "mm_semantics",
+      "answer": "Heavy atoms only",
+      "user_note": "Optionally add the ability to add hydrogens. Also allow the handling the side chains as single and multiple torsion-angled centroids."
+    },
+    {
+      "id": "heterogen_policy",
+      "answer": "Parse/preserve, limited score",
+      "user_note": "Also optionally allow generic element-based steric/contact scoring to everything."
+    },
+    {
+      "id": "centroid_model",
+      "answer": "Optional reduced model"
+    },
+    {
+      "id": "artifact_log",
+      "answer": "docs/planning"
+    },
+    {
+      "id": "examples",
+      "answer": "Include tests and examples for proteins examined in arXiv:2507.08955 and broader protein classes."
+    },
+    {
+      "id": "architecture",
+      "answer": "Good backend library implementation leveraged by CLI."
+    },
+    {
+      "id": "name",
+      "answer": "PHEAT",
+      "user_note": "Use Protein Heavy-atom Energy and Analysis Toolkit as the full name, with pheat as PyPI package/import/CLI."
+    },
+    {
+      "id": "planning_artifacts",
+      "answer": "Keep and store planning notes plus questions and answers in docs/planning.",
+      "user_note": "keep and store planning notes and questions and answers"
+    },
+    {
+      "id": "conversion_pipeline",
+      "answer": "Support all-atom PDB to atom-structure JSON, heavy-atom/PDB to best-effort residue-geometry JSON, and residue-geometry JSON to atom-structure JSON plus optional PDB output.",
+      "user_note": "We need to allow all atom PDB to heavy atom, and heavy atom to residue geometry, torsion to heavy atom pdf"
+    },
+    {
+      "id": "torsion_output",
+      "answer": "Heavy JSON plus PDB output.",
+      "user_note": "Selected Heavy JSON + PDB."
+    },
+    {
+      "id": "torsion_scope",
+      "answer": "Best-effort all residues.",
+      "user_note": "Canonical residues get backbone and supported chi extraction; heterogens/noncanonical residues are represented with warnings when residue geometry cannot be extracted or reconstructed."
+    },
+    {
+      "id": "round_trip_test_artifacts",
+      "answer": "Store small PDB/residue-geometry inputs and expected conversion outputs under tests/fixtures for golden comparison in executed tests.",
+      "user_note": "make sure test coverage exist for all the round trip functionality, store input and output results in repo for comparison to executed tests, keep small pdbs in test directory"
+    },
+    {
+      "id": "torsion_angle_units",
+      "answer": "Use radians by default for residue-geometry JSON and API/CLI conversion behavior; allow degrees with an explicit angle-units option.",
+      "user_note": "Allow using radians by default in addition to degrees, degrees can be selected via an option"
+    },
+    {
+      "id": "real_pdb_chi_tests",
+      "answer": "Use ../QTF/2MU7.pdb as a committed real-PDB fixture for chi extraction tests because it is compact and includes one-chi and multi-chi residues.",
+      "user_note": "Did you implement the tests for chi mentioned earlier, including for the real pdb file?"
+    },
+    {
+      "id": "real_pdb_full_roundtrip",
+      "answer": "Add a full 2MU7 real-PDB round trip through residue-geometry extraction, heavy/PDB reconstruction, and re-extracted residue geometry, comparing deterministic PHEAT outputs to committed golden files.",
+      "user_note": "Ok, implement the roundtrip test"
+    },
+    {
+      "id": "torsion_json_format",
+      "answer": "Use top-level angle_units for residue-geometry JSON, keep metadata for incidental annotations, and document chi arrays as chi1-to-chiN ordering via a top-level chi_order field.",
+      "user_note": "Is this json format good? Do this"
+    },
+    {
+      "id": "json_schema_definitions",
+      "answer": "Add Draft 2020-12 JSON Schema definitions for canonical heavy-atom, residue-geometry, centroid, and energy-result JSON outputs, bundle them with the package, and validate committed fixtures in tests.",
+      "user_note": "add json schema definitions"
+    },
+    {
+      "id": "terminal_oxt_policy",
+      "answer": "Do not add terminal OXT atoms by default during geometry-to-structure reconstruction; make them opt-in with an API/CLI option.",
+      "user_note": "make it optional, default is off."
+    },
+    {
+      "id": "kabsch_rmsd",
+      "answer": "Add true NumPy-backed Kabsch RMSD for optimal rigid-body superposition of matched coordinate sets while keeping NumPy out of the base install requirements.",
+      "user_note": "can you add Kabsch RMSD?"
+    },
+    {
+      "id": "code_comments_and_constant_provenance",
+      "answer": "Add concise comments for non-obvious implementation paths and document numeric constant provenance; cite verified literature references where applicable and label remaining constants as PHEAT heuristics.",
+      "user_note": "Add additional comments to code for documentation purposes. Also include information about where the constants being used were obtained from"
+    },
+    {
+      "id": "roundtrip_notebook_and_alignment_api",
+      "answer": "Add a JupyterLab Mol* notebook for the 2MU7 heavy-atom to residue-geometry roundtrip and split Kabsch alignment into a reusable function that can feed RMSD and visualization.",
+      "user_note": "Generate a JupyterLab notebook that is an example of the roundtrip, end with the creation of the energy comparisions, inlcuding the optional OpenMM, and the rmsds, and also generate a visualization of the alignment between the two using NGLView. Also if the current implementation does the alignment as part of the rmsd function, make it a standalone function, with the aligned structure being able to be provided as optional input to the rmsd function."
+    },
+    {
+      "id": "examples_directory_layout",
+      "answer": "Use a top-level examples directory for user-facing walkthroughs, place notebooks under examples/notebook, and keep src/pheat/data/examples for package/CLI manifests.",
+      "user_note": "Make an examples directory, and the notebook should be under examples/notebook, also any other potential examples to include?"
+    },
+    {
+      "id": "optional_omega_tau_theta_storage",
+      "answer": "Make omega, tau, and theta optional stored residue-geometry fields in both the Python backend API and CLI. Default residue-geometry JSON omits them; callers can opt into storing any or all of them.",
+      "user_note": "Make the storage of omega, tau, and theta angles optional in both libraries and CLI. We do not care about backwards compatibility."
+    },
+    {
+      "id": "omega_tau_theta_definitions",
+      "answer": "omega is the peptide-bond dihedral CA(i)-C(i)-N(i+1)-CA(i+1); tau is the intra-residue bond angle N(i)-CA(i)-C(i); theta is the peptide-link bond angle CA(i)-C(i)-N(i+1). Document these definitions in README and code.",
+      "user_note": "tau is one with alpha carbon in the middle and theta is carbonyl between alpha carbon; make sure the readme and the code include how these are defined"
+    },
+    {
+      "id": "local_miniforge_environment",
+      "answer": "Use an already-active conda/Miniforge development environment for implementation, building, and testing when dependencies are needed. User-facing Makefile and documentation commands should use `python`, `jupyter`, and `npm` from `PATH` rather than hardcoded environment prefixes.",
+      "user_note": "There is a miniforge installation in my home directory that you can use to make environments within this directory."
+    },
+    {
+      "id": "optional_chi_limit",
+      "answer": "Add an optional max-chi setting to Python API and CLI residue-geometry export. It keeps the first N chi angles per residue in chi1-to-chiN order. Default is no limit.",
+      "user_note": "Add the optional ability to limit the number of chi per residue, default is no limit."
+    },
+    {
+      "id": "combinatorial_2mu7_roundtrip_visualization",
+      "answer": "Create a runnable example script that exercises all subsets of stored omega, tau, and theta fields with chi limits of all, 1, and 2. Store aligned initial/reconstructed PDBs, energy comparisons, reported RMSDs, summary JSON/CSV, an HTML report, and static images.",
+      "user_note": "Create a script that will do the roundtrip example on 2mu7.pdb in a combinatorial fashion across the settings of storing omega, tau, and theta, and also with chi limit as all (None), 1, and 2. Visualization decision: HTML report plus static images."
+    },
+    {
+      "id": "torsion_dihedral_convention",
+      "answer": "Store conventional signed dihedral values for phi, psi, omega, and chi. Trans peptide omega values should be near +/-180 degrees; reconstruction converts these public values into the internal coordinate placement frame.",
+      "user_note": "We should fix this, store actual values."
+    },
+    {
+      "id": "omega_only_rmsd_explanation",
+      "answer": "The omega-only 2MU7 RMSD increase is expected for the current internal-coordinate model: measured omega values are preserved, but tau and theta remain idealized unless stored too. Mixed real omega with idealized tau/theta can be worse than the all-ideal fallback, while storing omega, tau, and theta together improves the backbone RMSD.",
+      "user_note": "Why does adding omega angle make the rmsd worse than using hard coded 180? Verify the explanation, fix and add to discussion/readme."
+    },
+    {
+      "id": "combinatorial_2mu7_energy_reporting",
+      "answer": "In the 2MU7 combinatorial roundtrip report, list the original all-heavy scores once and report reconstructed score totals for each case. Keep deltas in machine-readable outputs for comparison, but do not repeat original totals in every CSV row.",
+      "user_note": "The 2MU7 Combinatorial Roundtrip table should report the actual free energy calculated, only need to report the free energy for the original all heavy once."
+    },
+    {
+      "id": "openmm_dev_requirement_and_artifacts",
+      "answer": "Add OpenMM to the dev dependency set and use PDBFixer-backed preparation in the OpenMM scoring path when available. Regenerate 2MU7 artifacts so openmm-prepared rows contain real kJ/mol totals rather than unavailable statuses.",
+      "user_note": "Can we make openmm a dev requirement and rebuilt the artifacts as such?"
+    },
+    {
+      "id": "repository_consistency_review_fixes",
+      "answer": "Fix the consistency review findings by making in-memory residue-geometry reconstruction honor the same optional omega/tau/theta storage contract as serialized JSON, stopping residue-geometry extraction across residue-number gaps, accepting schema-valid null resseq as the residue index, nulling terminal sequence-shorthand residue geometry, seeding OpenMM/PDBFixer preparation, aligning PDBFixer dev extras, correcting the system-Python README smoke command, and keeping .conda only in .git/info/exclude.",
+      "user_note": "Try extra hard and examine this repository for logical errors and inconsistancies. fix these"
+    },
+    {
+      "id": "residue_geometry_naming",
+      "answer": "Rename the public torsion representation to residue geometry because it now stores dihedrals plus optional backbone bond angles. Use ResidueGeometryStructure/ResidueGeometry, residue-geometry JSON format pheat.residue-geometry-structure, CLI commands pdb-to-geometry, structure-to-geometry, and geometry-to-structure. Keep pheat as the package/import/CLI name and expand PHEAT as Protein Heavy-atom Energy and Analysis Toolkit.",
+      "user_note": "we are not public yet, if we go with ResidueGeometryStructure, how should we consider our package name, etc? Do this!"
+    },
+    {
+      "id": "private_v1_json_and_gap_handling",
+      "answer": "Because the repository is private and this is the only supported JSON version, enforce current canonical format/version headers for saved atom-structure and residue-geometry JSON while keeping dictionary shorthand for direct API construction. Also make residue-geometry reconstruction honor residue-number gaps as segment breaks, including optional OXT placement at each segment terminus.",
+      "user_note": "fix all these things, this is the only version and it is private"
+    },
+    {
+      "id": "ci_float_drift_golden_json",
+      "answer": "CI failures came from last-bit floating-point serialization differences between platforms. Keep in-memory geometry/scoring calculations unrounded, but canonical model JSON serialization rounds floats to 12 decimal places and normalizes -0.0 to 0.0 so committed golden fixtures compare exactly on GitHub Actions.",
+      "user_note": "i get these ci errors on github"
+    },
+    {
+      "id": "self_hosted_molstar_roundtrip_report",
+      "answer": "Use Mol* for the static HTML 2MU7 combinatorial roundtrip report because it provides a polished standalone molecular viewer. Vendor the Mol* browser assets locally and embed the aligned PDB data in the report so it works from disk without a CDN or runtime network access.",
+      "user_note": "for the report roundtrip, can we draw the structures better? this current approach is not good looking, using interactive in the html would be great, is Mol* (molstar) any good, how well would that work? how does it compare to nglviewer? would it be good to use molstar instead in other places? no CDN, all self contained"
+    },
+    {
+      "id": "notebook_molstar_viewer",
+      "answer": "Replace the Jupyter notebook molecular viewer with Mol* through ipymolstar MolViewSpec. Keep the notebook local-data oriented by sending an aligned combined PDB payload as an embedded data URI in the MolViewSpec state.",
+      "user_note": "can we replace nglviewer with molstar in jupyter, see also ipymolstar"
+    },
+    {
+      "id": "pip_all_dependency_parity",
+      "answer": "Make pip install -e \".[all]\" mirror the full repo Miniforge environment feature surface where pip has a satisfiable package set: scientific structure I/O through PHEAT-native PDB/mmCIF/BinaryCIF parsers, msgpack/numpy for BinaryCIF, FreeSASA for SASA, notebook, OpenMM/PDBFixer, tests, and linting tools. Keep the plain package install dependency-light.",
+      "user_note": "there is inconsistancies between pip install and miniforge based install, correct these, and include an \"[all]\" dependencies option"
+    },
+    {
+      "id": "generated_example_artifacts",
+      "answer": "Keep source example notebooks, scripts, and documentation committed, but do not commit executed notebooks, 2MU7 roundtrip outputs, or vendored Mol* browser assets. Add Makefile targets to build those artifacts on demand, including the pinned Mol* assets and the executed notebook.",
+      "user_note": "Can we add a Make file, the make file can build these artifacts, so we don't need to keep executed notebook, executed round trip, or vendored items."
+    },
+    {
+      "id": "local_roundtrip_web_app",
+      "answer": "Add an optional FastAPI web app exposed as `pheat web`. It accepts PDB uploads, offers a workflow selector for single, configurable, or combinatorial residue-geometry roundtrip comparisons, writes generated artifacts under `.pheat-cache/web/`, and uses self-hosted Mol* assets built by `make molstar` for the alignment viewer. The `make web` target prefers port 8000 and opts into a random available fallback port in 8001-8999 when 8000 is already taken. The default host remains local-only `127.0.0.1`; callers can explicitly set another host, with `0.0.0.0` meaning all IPv4 interfaces.",
+      "user_note": "Can we add a small web app that can accept a PDB file and then do the roundtrip comparison. Use FastAPI and give a function selector for the single, configurable, and combinatorial workflow options. Allow make web to choose a different port randomly if 8000 is already taken. Allow launching on a different IP, with local-only as default; keep 127.0.0.1 as default and document 0.0.0.0 as all interfaces."
+    },
+    {
+      "id": "nodejs_example_build_dependency",
+      "answer": "Include nodejs in environment.yml so the Miniforge development environment can provide npm, but keep the Makefile default as ambient npm from PATH rather than hardcoding the conda npm path.",
+      "user_note": "should nodejs be in conda environment.yml; have Makefile use ambient npm"
+    },
+    {
+      "id": "molstar_asset_cleanup_language",
+      "answer": "Use a small repo-local Python stdlib helper from `make molstar` to strip generated Mol* `sourceMappingURL` comments instead of relying on Perl.",
+      "user_note": "instead of perl can we use a different language"
+    },
+    {
+      "id": "molstar_semantic_colors_display_modes",
+      "answer": "Use stable semantic original/reconstructed colors in the HTML report and web app. Keep the original and reconstructed controls clickable with matching color dots, replace the side-chain overlay with ribbon/all-atom display modes using the full embedded heavy-atom PDBs, expose full Mol* controls, and make Recolor update existing representation colors in-place without reloading the PDB data. Dim hidden structure toggles only; show the selected ribbon/all-atom display mode with an active outline while leaving the unselected mode readable and clickable.",
+      "user_note": "In molestar, clicking default under apply representation changes the blue to green, can we keep it blue, or start with it as green to match molstar defaults. Also, can we add quick button to hide and show sidechains, with being shown by default. The sidechains float away from ribbons, so use ribbon/all atom instead. Recolor should recolor all atoms, not reset/reload. The ribbon/all atom buttons should not make the unselected option look disabled; show the selected mode with an outline or similarly clear cue."
+    },
+    {
+      "id": "canonical_ring_reconstruction",
+      "answer": "Reconstruct canonical amino-acid rings as closed heavy-atom templates for PRO, PHE, TYR, HIS, and TRP. This corrects aromatic and imidazole ring closures without adding new residue-geometry angle fields.",
+      "user_note": "The reconstructed PHE are not rings; we need to do all the rings too."
+    },
+    {
+      "id": "disulfide_connectivity_preservation",
+      "answer": "Preserve explicit disulfide-linked cysteine connectivity from SSBOND or CYS SG-to-SG CONECT records through atom-structure JSON, residue-geometry JSON, reconstruction, and PDB output. Do not infer disulfides by sulfur distance and do not add disulfide geometry fitting or disulfide-specific torsions.",
+      "user_note": "Support Disulfide-linked cysteines, but do not include the geometry."
+    },
+    {
+      "id": "supported_natural_noncanonical_residues",
+      "answer": "Add residue-geometry extraction and reconstruction support for the natural/special residues SEC, PYL, MSE, HYP, LYZ, SEP, TPO, PTR, and PCA. Keep the canonical scoring set as the 20 common amino acids. Use U and O one-letter shorthand only for SEC and PYL, require CCD three-letter names for other modified residues, and accept HYL only as an input alias that normalizes to the CCD component code LYZ.",
+      "user_note": "Are there additional non canonical AAs that we should include that are well documented and found in nature? Lets do these."
+    },
+    {
+      "id": "ccd_source_license_and_integration",
+      "answer": "Cite the wwPDB CCD documentation, RCSB download documentation, RCSB usage policy, CC0 deed, CCD publication, and every consulted modified-residue CCD definition CIF for SEC, PYL, MSE, HYP, LYZ, SEP, TPO, PTR, and PCA. Identify the source data license as CC0 1.0 Universal. The CCD files are not vendored, redistributed, or packaged; they are reference-only inputs used to derive hand-maintained PHEAT residue templates.",
+      "user_note": "Make sure all sources are cited, including the downloaded files. What is the license of those downloaded files, and how are they being integrated?"
+    },
+    {
+      "id": "local_testing_tooling_artifacts",
+      "answer": "Add pytest, coverage, pytest-cov, mypy, tox, and nox to the full development surfaces for both pip extras and environment.yml. Provide Makefile targets for test, coverage, coverage-html, lint, typecheck, and check. Ignore generated coverage, HTML coverage, mypy, tox, nox, and notebook checkpoint artifacts in .gitignore while keeping repo-local .conda environments in .git/info/exclude.",
+      "user_note": "Add the suggested .gitignore entries, and add testing/tooling entries that let those artifacts be generated locally without committing them."
+    },
+    {
+      "id": "python39_pip_openmm_resolution",
+      "answer": "Keep Python 3.9 support for the core/test surface, but mark pip OpenMM/PDBFixer extras as Python 3.10+ because PDBFixer 1.12.0 requires openmm>=8.2 and the Python 3.9 pip resolver can select only older OpenMM wheels on supported test platforms. Python 3.9 tests should accept openmm-prepared scores as unavailable when OpenMM is absent; Python environments with OpenMM still require successful kJ/mol scoring.",
+      "user_note": "pheat tests are failing on python 3.9"
+    },
+    {
+      "id": "radius_of_gyration_cli_reports_and_sources",
+      "answer": "Add unweighted and mass-weighted radius-of-gyration support for atom structures. Expose it through `pheat radius-of-gyration` and the `pheat rg` alias, include original/reconstructed Rg and deltas in roundtrip metrics, generated reports, CSV summaries, the web app, and the notebook, and validate the CLI JSON payload with a schema. Use CIAAW Standard Atomic Weights 2024 and the NIST Atomic Weights and Isotopic Compositions database as cited references for the compact representative mass table; do not download, vendor, redistribute, or package those atomic-weight sources, and mark them reference-only in the source manifest.",
+      "user_note": "Add radius of gyration support, include in reports. Add CLI, also check license for downloads and document accordingly."
+    },
+    {
+      "id": "molstar_pheat_report_citations",
+      "answer": "Name Mol* in the visible interactive alignment viewer headings and include compact report/web-app citation links for Mol*, the Mol* Nucleic Acids Research paper DOI, and the PHEAT upstream repository. Keep the browser HTML title strings unchanged.",
+      "user_note": "In the report with interactive alignment viewers, put Mol* as part of the in-text title, and provide links and citations to Mol* and PHEAT itself using the upstream GitHub repository."
+    },
+    {
+      "id": "active_conda_environment_for_make_and_docs",
+      "answer": "Assume the conda/development environment is already active for Makefile and user-facing documentation commands. Use `python`, `jupyter`, and `npm` from `PATH`; do not hardcode repo-local conda prefixes or prefix-based environment commands in Makefile targets, README commands, or examples README commands.",
+      "user_note": "For the Make files, readmes, etc, assume that the conda environment is already active; no prefix stuff."
+    },
+    {
+      "id": "html_sticky_sortable_tables",
+      "answer": "Make generated HTML report and web-app result tables self-contained sortable tables with sticky headers. Table headers stay visible while scrolling within each table's extent, can be clicked or activated by keyboard, update aria-sort state, and sort existing rows in place without external JavaScript dependencies.",
+      "user_note": "In html allow headers of tables to float until end of table, allow sorting by clicking on the header."
+    },
+    {
+      "id": "mmcif_coordinate_io",
+      "answer": "Add mmCIF coordinate input and optional mmCIF output while keeping atom-structure JSON and residue-geometry JSON as the canonical internal formats. Parse author chain/residue identifiers by default, allow label identifiers with an option, preserve full chain IDs in JSON/mmCIF, and require explicit truncation for legacy PDB output when chain IDs exceed one character.",
+      "user_note": "Should we add mmCIF support? Also allow optionally writing to mmCIF. Why is pheat doing one char chain id?"
+    },
+    {
+      "id": "readme_scoring_model_comparison",
+      "answer": "Document the five scoring models in the README with a compact comparison table. Make clear that generic, pheat-dfire, pheat-goap, and heavy-mm are deterministic arbitrary-unit approximations, openmm-prepared is the optional kJ/mol OpenMM path, and users should compare original vs reconstructed scores within the same model rather than comparing absolute totals across models.",
+      "user_note": "Compare all the scoring functions. Is this info provided in the readme or other documentation? Add this."
+    },
+    {
+      "id": "pheat_dfire_goap_scoring_names",
+      "answer": "Rename the repo-generated DFIRE- and GOAP-inspired heuristic scorer IDs to `pheat-dfire` and `pheat-goap` everywhere. `pheat-dfire` is generated from built-in PHEAT hydrophobicity, element-contact, coarse distance-bin, and side-chain burial constants. `pheat-goap` layers a PHEAT residue orientation-vector term on top of `pheat-dfire`. The original DFIRE and GOAP papers remain citations for inspiration; their original parameter tables are not redistributed or used.",
+      "user_note": "For dfire and goap, rename them as pheat-dfire and pheat-goap, and document how they were generated for this repo."
+    },
+    {
+      "id": "pdb_archive_schema_provenance",
+      "answer": "Add `pheat archive download`, rooted by default at `.pheat-cache/pdb-archive`, for corpus construction. It can use explicit ID lists, all-current holdings, or raw Search API JSON queries, writes atomic coordinate downloads plus file manifests, reuses existing raw directories without redownloading, and records transient RCSB schema provenance in `api-schemas.json` as URL, retrieval timestamp, content SHA-256, content length, headers, version/license metadata, and `stored: false`. Do not vendor schema bodies and do not add the external `rcsb-api` package.",
+      "user_note": "Do not store RCSB OpenAPI/schema files, but report version/checksum/download date. More than one schema/service may be useful; avoid `rcsb-api` unless it proves useful."
+    },
+    {
+      "id": "archive_snapshot_commands",
+      "answer": "Add `pheat archive snapshots list`, `describe`, `download`, and `verify` commands. Treat built-in snapshots as PHEAT-defined presets over public RCSB/wwPDB current-holdings coordinate endpoints, with per-snapshot default output roots, snapshot metadata recorded in `filters.json`, and verification against PHEAT-recorded SHA-256 checksums in `files.jsonl`.",
+      "user_note": "Add commands to list downloadable snapshots, describe them, download a selected snapshot, and verify local snapshot files."
+    },
+    {
+      "id": "archive_snapshot_staging",
+      "answer": "Add reusable snapshot download support with `--staging-dir`, `--cleanup-staging`, and `--reuse-mode copy|reference`. Pending files can download into local staging storage, be SHA-256 checked, be promoted into the final archive `raw/` directory, and be verified again before manifest recording. Default reused-file behavior is `copy` so snapshots are self-contained; `reference` is available when manifests may point at another raw-file location. Existing final files are skipped when they match a prior manifest checksum and redownloaded when they are stale.",
+      "user_note": "For reusable BinaryCIF snapshots, use local staging in the current directory and final network-attached storage under a user-selected external archive root."
+    },
+    {
+      "id": "cli_startup_status",
+      "answer": "Add immediate startup/status output for every `pheat` CLI command. Print the PHEAT version, resolved command path, key inputs/outputs, and archive progress to `stderr` with flushing so long-running commands do not look stuck. Preserve machine-readable results on `stdout`, add `--version`, and add global `--quiet`/`-q` to suppress startup/progress status without suppressing errors.",
+      "user_note": "When launching the snapshot download, initial silence made it look stuck; all CLI commands should report PHEAT/version and what they are going to do."
+    },
+    {
+      "id": "native_binarycif_input",
+      "answer": "Support BinaryCIF input natively through PHEAT's direct BinaryCIF atom-site decoder with `msgpack` and `numpy` included in the scientific/dev/all dependency surfaces and conda environment. Add `bcif-to-structure`, `bcif-to-geometry`, and automatic `.bcif`/`.bcif.gz` loading for score and radius-of-gyration commands. Keep BinaryCIF support input-only for now. Biopython is not used for BinaryCIF parsing.",
+      "user_note": "Check options for enabling BinaryCIF natively and with potential dependency, then implement the Biopython/msgpack plan."
+    },
+    {
+      "id": "training_artifact_versions",
+      "answer": "Separate schema `version` from training artifact versions. Corpus selection writes `artifact_id`, `artifact_version`, `artifact_label`, member-list checksums, selected-entry checksums, and snapshot provenance when available. Score-table builds record source corpus artifact metadata and use corpus-aware profile IDs such as `protein-heavy-30id-contacts`. Add describe commands for corpus and table artifacts, plus Makefile variables for corpus/table IDs and versions.",
+      "user_note": "For score building and definitions, allow variable clustering threshold labels and handle new corpus/table versions over time as PDB snapshots and selection rules change."
+    },
+    {
+      "id": "supported_vs_available_scoring_models",
+      "answer": "Make `available_models()` mean scoring models runnable in the active environment. Add `supported_models()` for all recognized model IDs, including optional models such as `openmm-prepared`, and add `model_capabilities()` to report supported/available status, units, required dependencies, and optional enhancements. Internal validation for CLI choices and roundtrip score-model selection should use supported models so optional models remain accepted and can report unavailable status at scoring time.",
+      "user_note": "For the list of available models, report optional models separately from models that are actually usable in the current environment."
+    },
+    {
+      "id": "expected_rg_shape_score",
+      "answer": "Add `pheat-rg` as a runnable placeholder compactness score. It defaults to C-alpha, unweighted radius of gyration and computes a squared standardized deviation from `expected_rg = a * residue_count ** b` using placeholder coefficients. Score-table entries can override atom set, Rg mode, coefficients, and sigma fraction, but the model is not part of default training-table generation until fitted coefficients are defined.",
+      "user_note": "Add a scoring type based on generic expected Rg; fitting will happen later, but the API/CLI capability should exist now."
+    },
+    {
+      "id": "opt_in_reconstruction_geometry_tables",
+      "answer": "Keep current fixed Engh-Huber-style reconstruction as the default, and add opt-in `pheat.geometry-table-set` artifacts for reconstruction targets. Provide commands to build backbone geometry tables from selected local corpora, build CCD-derived side-chain geometry tables from cached component CIFs, validate/describe those artifacts, and use a supplied geometry table during `geometry-to-structure` reconstruction. Table-mode reconstruction can use phi/psi-binned tau/theta targets when stored tau/theta are absent, while preserving stored omega/tau/theta as authoritative.",
+      "user_note": "Consider improving reconstruction with geometry modes, context-aware/CDL-style backbone targets, and CCD side-chain values; do not include QTF-specific behavior."
+    },
+    {
+      "id": "ccd_full_and_bcif_sources",
+      "answer": "Allow both full wwPDB CCD mmCIF and compact RCSB CCD BinaryCIF atom/bond subset caches. Use full `components.cif.gz` as the preferred source for side-chain reconstruction geometry because it contains the ideal/model-coordinate and bond-distance data needed to derive bond lengths and angles. Keep `cca.bcif`/`ccb.bcif` as a smaller connectivity-only cache, and document CDL as non-vendored reference material unless a future optional CCTBX importer or reviewed derived table is added.",
+      "user_note": "Allow both CCD source forms, but get and use the full CCD now for geometry-table generation."
+    },
+    {
+      "id": "packaged_ccd_geometry_table",
+      "answer": "Commit the small derived CCD side-chain geometry table as plain packaged JSON under `src/pheat/data/geometry`, with a packaged geometry manifest containing source CCD provenance and table checksum. Keep raw CCD source files outside the repo and package. Add loader and CLI support so `--geometry-table ccd-sidechain-geometry-v1` resolves the bundled table by ID.",
+      "user_note": "Keep the CCD-derived runtime table in the repo, but do not vendor raw CCD; use a data directory rather than a generic assets directory."
+    },
+    {
+      "id": "example_report_ccd_combinatorics",
+      "answer": "Make the generated 2MU7 combinatorial example report compare reconstruction geometry variants by default. Include both fixed PHEAT template geometry and the packaged `ccd-sidechain-geometry-v1` side-chain geometry table across the existing optional-angle and chi-limit sweep, and surface the geometry variant in summary JSON, CSV, report tables, and the Mol* viewer details.",
+      "user_note": "For the example report, provide additional combinatorics where CCD is used."
+    },
+    {
+      "id": "atom_structure_hydrogens_and_bond_lengths",
+      "answer": "Refactor the canonical coordinate JSON to atom-structure format with an explicit atom_scope flag. Defaults remain heavy and compact: hydrogens are dropped unless --hydrogens preserve or generate is selected, top-level bonds are omitted unless --store-bonds is selected, and residue-geometry bond lengths are omitted unless --store-lengths is selected. Optional bond records use zero-based atom indices and coordinate-measured Angstrom lengths; residue-geometry bond_lengths are used before geometry tables and fixed defaults during reconstruction.",
+      "user_note": "Optionally include hydrogens now and optionally store all bond lengths for any identified bond while using a uniform schema if possible."
+    },
+    {
+      "id": "generated_cdl_geometry_tables",
+      "answer": "Add opt-in PHEAT-generated conformation-dependent backbone geometry tables with `pheat geometry tables build-cdl`. The builder reads a selected local corpus, bins phi/psi space, records backbone bond-length and bond-angle targets, supports configurable bin size, minimum bin count, smoothing metadata, and residue-class grouping, and records full provenance in the geometry-table-set JSON. Add `pheat geometry tables import-cdl` for JSON CDL-like tables while recording input path, checksum, and source-license notes. Reconstruction still treats stored residue bond lengths and stored tau/theta as authoritative before table lookup.",
+      "user_note": "Keep fixed reconstruction as default, but enable CCD and CDL-like geometry options, including obtaining or calculating PHEAT-owned values."
+    },
+    {
+      "id": "score_input_contracts",
+      "answer": "Keep atom-structure coordinates as the canonical scoring input, including for torsion-derived reconstructions. Add per-model score input contracts that record expected structure type, accepted atom scopes, compatible domains, required atom families, hydrogen behavior, table usage, burial dependence, and whether a scorer uses coordinates, derived torsions, feature vectors, or an internally prepared OpenMM system. Store the contract in scoring results and generated score-table entries so reference-derived tables can be checked against requested scoring domains.",
+      "user_note": "Confirm that each score function uses the correct structure type and record that explicitly without letting the torsion/reconstruction use case distort the general scoring design."
+    },
+    {
+      "id": "ambertools_sander_prepared_scoring",
+      "answer": "Add `ambertools-sander` as a first-class optional scorer. It is supported by the API/CLI but available only when AmberTools `tleap` and `sander` executables are on PATH. The scorer accepts heavy-atom or partial protein inputs with `--prepare auto`, uses OpenMM/PDBFixer preparation to add hydrogens and supported missing atoms before building AMBER topology files, runs a single-point `sander` calculation, and records preparation details, executables, force-field settings, solvent mode, command lines, and warnings that the result is a molecular mechanics potential energy rather than folding free energy. For GB solvent mode, PHEAT sets tleap `PBRadii mbondi3` and records the selected radii in result metadata. AmberTools is documented as a conda/external executable dependency, not a pip extra.",
+      "user_note": "Implement AmberTools/Sander scoring now, including preparation of non-all-atom inputs and dependency/environment updates."
+    },
+    {
+      "id": "gromacs_forcefield_backend_evaluation",
+      "answer": "Add `gromacs-mdrun` as a first-class optional scorer and validation path. It is supported by the API/CLI but available only when the GROMACS `gmx` executable is on PATH. The default force field is `amber19sb`; `--gromacs-water auto` resolves to `none` for default unsolvated rerun scoring and to `opc` when `--gromacs-solvate` is selected. The backend checks the active GROMACS force-field directory before `pdb2gmx` and reports installed force-field names when the requested one is missing. It writes a pdb2gmx input PDB, optionally uses OpenMM/PDBFixer to fill supported missing atoms before stripping hydrogens, runs `gmx pdb2gmx`, `gmx grompp`, `gmx mdrun -rerun` or minimization modes, extracts terms with `gmx energy`, and can attempt `gmx gyrate` validation metrics. Add `pheat gromacs prepare`, `score`, `minimize`, and `validate` commands using the same backend. GROMACS results are documented as force-field validation/reranking energies, not folding free energies.",
+      "user_note": "Implement GROMACS now as an optional open-source validation/reranking backend for topology prep, hydrogen addition, energy minimization, single-point or rerun energy checks, and geometry/trajectory metrics."
+    },
+    {
+      "id": "score_implementation_origin_annotations",
+      "answer": "Annotate score model capabilities and energy-result metadata with an `implementation` block. Native PHEAT models report `origin: native-pheat` and `backend: pheat`; OpenMM reports `origin: external-python`; AmberTools and GROMACS report `origin: external-executable`. The block also includes boolean `native_pheat` and `external` fields plus a short backend summary so reports and downstream workflows can distinguish built-in heuristics from externally executed force-field calculations.",
+      "user_note": "Annotate scoring and related functions to confirm whether they are native PHEAT or external."
+    },
+    {
+      "id": "external_scoring_runtime_controls",
+      "answer": "Add per-command timeout support for AmberTools and GROMACS subprocesses, public option validation through `validate_external_scoring_options(...)`, CLI validation commands (`pheat scoring validate-options` and `pheat gromacs validate-options`), configurable GROMACS MDP/run settings, and conservative external preparation cache metadata. External command failures preserve captured stdout/stderr tails, and AmberTools failures append `leap.log` or `sander.out` tails when those files exist. GROMACS topology-cache reuse is enabled only for `--prepare never` all-atom/full-domain inputs that include hydrogens and keep the same atom order; runtime MDP and mdrun settings are not part of the topology cache key. Heavy-atom auto-preparation reports the cache as disabled instead of reusing an incompatible topology.",
+      "user_note": "PHEAT should add external-command timeout support, configurable GROMACS settings, public validation helpers, and optional reusable preparation/topology cache for reranking."
+    },
+    {
+      "id": "reference_ml_pipeline",
+      "answer": "Add a `pheat reference` workflow and matching Makefile targets for local reference builds. Defaults use the reusable `rcsb-current-bcif` snapshot, protein-heavy domain, X-ray-only selection, 30% sequence-identity clustering, max resolution 2.5 A, and artifact version `v0` for the current initial build. The workflow can record/fetch reference inputs, inventory snapshots with multiple workers, select aqueous and membrane subsets, generate PHEAT-owned deterministic decoys, build score tables including fitted `pheat-rg` coefficients, extract native/decoy features, train a lightweight `pheat-ml-linear` baseline, validate score separation, audit artifact-version labels, and promote packageable reviewed artifacts. External decoy datasets such as 3DRobot, CASP, I-TASSER, and Rosetta are recorded with source links, SHA-256 checksums, dates, and local-use-only/packageable flags unless their redistribution terms are reviewed.",
+      "user_note": "Build the reference and ML tooling around local snapshots, X-ray crystal structures, 30% identity clustering, v0 prototype artifacts, multi-CPU execution, decoy datasets, generated PHEAT decoys, and future promotion to reviewed versions."
+    },
+    {
+      "id": "snapshot_metadata_for_reference_builds",
+      "answer": "Add `pheat archive snapshots metadata` to generate compact normalized metadata rows for local snapshots before reference inventory. Keep method, resolution, dates, quality metrics, composition, polymer/entity mapping, sequence-cluster IDs, and aqueous/membrane/computed-model flags. Do not keep atom coordinates, raw API payloads, schema bodies, full citations, full crystallization text, or per-residue validation by default. Also add snapshot manifest relocation support so moved archives can be rewritten to relative paths.",
+      "user_note": "Use the existing local snapshot, repair stale absolute paths this time, and extract the metadata needed for X-ray, quality, aqueous/membrane, and clustering filters without bloating durable artifacts."
+    },
+    {
+      "id": "fresh_v0_reference_build_results",
+      "answer": "Rebuild local v0 reference artifacts from a reusable `rcsb-current-bcif` archive snapshot. Metadata extraction wrote 254,186 rows with zero failures; inventory wrote 1,062,606 chain/domain rows with 45 failed records. Selection produced 21,723 aqueous and 2,373 membrane X-ray protein-heavy chains at 30% identity, max resolution 2.5 A, and length 50-800. Score tables were built for both aqueous and membrane using contacts plus FreeSASA-backed SASA profiles. Decoys and features now materialize the selected chain/domain, not the whole source structure, and tests cover that behavior. Provisional ML features use `--max-entries 3000`: aqueous contains 3,000 native plus 3,000 matching decoys; membrane is complete at 2,373 native plus 2,373 decoys. The cap is recorded in feature manifests so v0 remains explicitly provisional.",
+      "user_note": "Start fresh with the native parser/FreeSASA implementation, rebuild v0 reference/ML artifacts, keep provenance/logging, and avoid treating whole deposited structures as selected chain records."
+    },
+    {
+      "id": "pheat_native_geometry_scoring_public_apis",
+      "answer": "Add only generally useful PHEAT-native APIs: `residue_angle_specs(...)` for sequence residue-angle metadata, `pheat-geometry-integrity` for robust coordinate-geometry quality scoring, `score_model_option_specs(...)` for structured scorer option metadata, and `validate_scoring_options(...)` for non-executing scorer option validation. Use `max_chi` and optional `selective_chi_map` instead of a separate chi-mode argument. Add schemas for the public metadata payloads. Keep geometry-integrity deterministic with explicit diagnostic tolerances and weights; defer trained calibration to future reference builds. Do not add QTF-shaped aliases or optimizer-specific terms to PHEAT public APIs.",
+      "user_note": "Only things that are generally useful should be in PHEAT and PHEAT can design them in the way that makes the most sense. chi1_only is just max_chi=1; add schemas/specs; refine geometry-integrity constants but do not train them yet."
+    },
+    {
+      "id": "unattended_initial_v0_reference_decoy_builds",
+      "answer": "Add `pheat reference run-unattended` and `make reference-unattended` for non-interactive initial v0 reference builds. The unattended workflow records inputs, extracts snapshot metadata, inventories the snapshot, selects aqueous and membrane X-ray 30% identity protein-heavy corpora, runs a canary, generates PHEAT-owned torsion-space decoys with the `pheat-torsion-v1` profile, builds contact and SASA score tables, extracts native/decoy features including geometry-integrity, trains subset-specific `pheat-ml-linear` models, writes validation reports, and logs every stage. The default decoy profile perturbs PHEAT residue-geometry degrees of freedom rather than raw Cartesian coordinates, records RMSD/Rg/geometry-integrity quality metrics, and keeps older coordinate-noise recipes only as smoke-test options.",
+      "user_note": "Generate real PHEAT-owned decoys and build the reference datasets, scoring tables, and ML artifacts in an unattended overnight run."
+    },
+    {
+      "id": "packaged_initial_v0_scoring_assets",
+      "answer": "Package the completed reference-build score tables and `pheat-ml-linear` models as compressed JSON.xz initial `v0` assets under `src/pheat/data/scoring/v0`. Expose them through exact `packaged:<id>` references and keep the large source snapshot, decoy JSONL, feature JSONL, and logs outside the repository. The bundled assets are functional testing artifacts with compressed and uncompressed checksums, build dates, source-run metadata, selected/decoy/feature counts, and sanitized relative provenance paths.",
+      "user_note": "Treat the completed build as v0 still, put the small score/model artifacts in the repo for initial testing, and keep the larger archive outputs external."
+    },
+    {
+      "id": "pdb_writer_domain_filtering",
+      "answer": "Expose PHEAT's domain helpers from the package root and allow Python callers to pass `domain=` to `write_pdb` and `structure_to_pdb_string`. The writer uses the same domain semantics as scoring: `protein-heavy` keeps supported protein heavy atoms, `all-heavy` keeps nonprotein heavy atoms while dropping hydrogens, and `full` keeps every atom already present in the structure object. This remains an API-level feature for now rather than a new CLI option.",
+      "user_note": "Document the new PDB-domain filtering behavior, assess it, and include it in the amend commit."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "artifact_version": "v0",
+  "features": "reference-builds/features/v0/aqueous-features.jsonl",
+  "format": "pheat.reference-features",
+  "training_set": "reference-builds/sets/protein-heavy-30id-xray-aqueous-v0",
+  "version": 1
+}

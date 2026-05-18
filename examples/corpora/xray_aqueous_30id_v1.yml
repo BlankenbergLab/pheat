@@ -1,0 +1,51 @@
+corpus_id: pheat-xray-aqueous-30id
+version: v1
+description: Archived-snapshot aqueous X-ray corpus template; dry-run locally unless a snapshot is supplied.
+source:
+  type: rcsb_snapshot
+  format: bcif
+  snapshot_label: TODO-rcsb-current-bcif
+  license_note: RCSB/wwPDB archive data with explicit snapshot provenance.
+selection:
+  atom_domain: protein-heavy
+  experimental_methods:
+    - X-RAY DIFFRACTION
+  max_resolution_angstrom: 2.5
+  min_length: 50
+  max_length: 800
+  sequence_identity:
+    method: recorded-clusters-or-user-provided
+    threshold: 0.3
+  require_complete_backbone: true
+  allow_modified_residues: true
+  allow_altlocs: true
+  allow_insertion_codes: true
+geometry:
+  store_angles:
+    - omega
+    - tau
+    - theta
+  store_lengths: protein-heavy
+  store_chi: all
+  reconstruction_mode: pheat-default
+scoring:
+  profiles:
+    - generic
+  burial_methods:
+    - contacts
+    - sasa
+decoys:
+  enabled: true
+  recipe: pheat-torsion-v1
+  n_per_native: 10
+  seed: 20260529
+outputs:
+  include_manifest: true
+  include_features: true
+  include_score_tables: true
+  include_decoys: true
+  compression: xz
+provenance:
+  pheat_version: 0.1.0
+  created_by: PHEAT reference corpus template
+  notes: TODO - rebuild from archived source snapshot before production use.

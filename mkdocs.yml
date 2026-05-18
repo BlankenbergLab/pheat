@@ -1,0 +1,66 @@
+site_name: pheat
+site_url: https://pheat.tools.blankenberglab.org/
+site_description: Documentation for pheat
+repo_url: https://github.com/BlankenbergLab/pheat
+repo_name: BlankenbergLab/pheat
+
+docs_dir: docs
+site_dir: site
+
+exclude_docs: |
+  planning/**
+  logo-options.html
+
+theme:
+  name: material
+  custom_dir: overrides
+  logo: assets/images/blankenberglab-logo.svg
+  favicon: assets/favicon.ico
+  language: en
+  palette:
+    - scheme: default
+      primary: green
+      accent: amber
+  features:
+    - navigation.instant
+    - navigation.path
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - src
+          options:
+            docstring_style: google
+            members_order: source
+            merge_init_into_class: true
+            separate_signature: true
+            show_if_no_docstring: false
+            show_root_heading: true
+            show_signature_annotations: true
+            show_source: true
+            signature_crossrefs: true
+
+extra_css:
+  - assets/brand.css
+
+extra:
+  generator: false
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - API:
+      - Basic API: api.md
+      - Advanced API: advanced-api.md
+  - Reference Data:
+      - Initial v0 Reference Build: reference-build-v0.md
+  - Deployment: deployment.md

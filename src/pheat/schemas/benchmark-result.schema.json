@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pheat.dev/schemas/benchmark-result.schema.json",
+  "title": "PHEAT benchmark result row",
+  "type": "object",
+  "required": ["record_id", "comparator", "comparator_status", "runtime_seconds", "pheat_version"],
+  "additionalProperties": true,
+  "properties": {
+    "record_id": {"type": "string"},
+    "pdb_id": {"type": ["string", "null"]},
+    "chain_id": {"type": ["string", "null"]},
+    "benchmark": {"type": ["string", "null"]},
+    "comparator": {"type": "string"},
+    "comparator_status": {"type": "string"},
+    "parse_success": {"type": ["boolean", "null"]},
+    "reconstruction_success": {"type": ["boolean", "null"]},
+    "failure_reason": {"type": ["string", "null"]},
+    "atom_count": {"type": ["integer", "null"], "minimum": 0},
+    "protein_heavy_atom_count": {"type": ["integer", "null"], "minimum": 0},
+    "residue_count": {"type": ["integer", "null"], "minimum": 0},
+    "chain_count": {"type": ["integer", "null"], "minimum": 0},
+    "runtime_seconds": {"type": "number", "minimum": 0},
+    "peak_memory_mb": {"type": ["number", "null"]},
+    "source_path": {"type": ["string", "null"]},
+    "pheat_version": {"type": "string"}
+  }
+}

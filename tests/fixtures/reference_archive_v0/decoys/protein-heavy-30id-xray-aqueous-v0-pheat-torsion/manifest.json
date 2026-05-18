@@ -1,0 +1,8 @@
+{
+  "artifact_version": "v0",
+  "decoys": "reference-builds/decoys/protein-heavy-30id-xray-aqueous-v0-pheat-torsion/decoys.jsonl",
+  "format": "pheat.reference-decoys",
+  "output_root": "reference-builds/decoys/protein-heavy-30id-xray-aqueous-v0-pheat-torsion",
+  "recipe_profile": "pheat-torsion-v1",
+  "version": 1
+}

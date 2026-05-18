@@ -1,0 +1,15 @@
+{
+  "artifact_label": "pheat-ml-linear-v0",
+  "artifact_version": "v0",
+  "default_profile": "protein-heavy-contacts",
+  "format": "pheat.score-table-set",
+  "metadata": {
+    "training_features": "reference-builds/features/v0/aqueous-features.jsonl"
+  },
+  "profiles": {
+    "protein-heavy-contacts": {
+      "models": {}
+    }
+  },
+  "version": 1
+}

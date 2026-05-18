@@ -1,0 +1,10 @@
+{
+  "artifact_version": "v0",
+  "format": "pheat.reference-fetch",
+  "pheat_version": "0.1.0",
+  "snapshot": {
+    "snapshot_id": "fixture-snapshot",
+    "snapshot_root": "fixture-snapshot/root"
+  },
+  "version": 1
+}

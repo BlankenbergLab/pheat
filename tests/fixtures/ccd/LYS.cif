@@ -1,0 +1,29 @@
+data_LYS
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.model_Cartn_x
+_chem_comp_atom.model_Cartn_y
+_chem_comp_atom.model_Cartn_z
+LYS N N 0.000 0.000 0.000
+LYS CA C 1.458 0.000 0.000
+LYS C C 1.943 1.446 0.000
+LYS CB C 1.930 -0.650 -1.230
+LYS CG C 3.360 -0.250 -1.530
+LYS CD C 4.280 -1.350 -1.950
+LYS CE C 5.710 -0.950 -2.250
+LYS NZ N 6.610 -2.050 -2.660
+#
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.value_order
+_chem_comp_bond.value_dist
+LYS CB CG SING 1.53
+LYS CG CD SING 1.53
+LYS CD CE SING 1.53
+LYS CE NZ SING 1.49
+#
