@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use PHEAT, please cite the software release and manuscript when available."
+title: "PHEAT: Protein Heavy-atom Energy and Analysis Toolkit"
+authors:
+  - name: "PHEAT contributors"
+version: "0.1.0"
+date-released: "TODO"
+doi: "TODO"
+url: "https://github.com/BlankenbergLab/pheat"
+license: "MIT"

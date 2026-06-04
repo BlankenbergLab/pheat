@@ -40,6 +40,8 @@ make docs-serve
 - Review [Corpus Specs](corpus-specs.md), [Reference Manifests](reference-manifests.md),
   and [CCD Heterogen Annotation](ccd-heterogen-annotation.md)
   for schema-validated reference-corpus workflows.
+- Review the [paper-0 readiness checklist](paper-0-submission-readiness.md)
+  for the paper-specific draft benchmark workstream.
 - Review [Deployment](deployment.md) for the Cloudflare Workers static-assets
   configuration.
 
@@ -48,6 +50,12 @@ make docs-serve
 PHEAT includes a small offline vertical slice for schema-validated corpus specs,
 reference manifests, and CCD-aware component summaries. These demo outputs are
 workflow checks, not calibrated scientific benchmark results.
+
+## paper-0 Draft
+
+The `paper-0-draft` branch includes paper-specific benchmark scaffolding,
+draft outline material, and PDF assembly support. Demo outputs are workflow
+checks only, not manuscript-scale scientific results.
 
 ## Blankenberg Lab
 

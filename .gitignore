@@ -20,3 +20,13 @@ site/
 examples/notebook/executed/
 examples/roundtrip/
 examples/vendor/
+benchmarks/paper-0/results/demo/
+benchmarks/paper-0/results/full/
+benchmarks/paper-0/results/paper/
+benchmarks/paper-0/tables/demo/
+benchmarks/paper-0/tables/full/
+benchmarks/paper-0/tables/paper/
+benchmarks/paper-0/figures/demo/
+benchmarks/paper-0/figures/full/
+benchmarks/paper-0/figures/paper/
+benchmarks/paper-0/paper/*.pdf

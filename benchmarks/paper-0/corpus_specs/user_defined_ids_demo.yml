@@ -1,0 +1,52 @@
+corpus_id: pheat-paper-0-demo
+version: v1
+description: Offline paper-0 demo corpus; not a scientific result.
+source:
+  type: id_list
+  format: pdb
+  source_root: ../../../tests/fixtures
+  ids_file: user_defined_ids.txt
+  snapshot_label: local-fixture-demo
+  license_note: Local repository fixtures for offline testing and demonstration.
+selection:
+  atom_domain: protein-heavy
+  experimental_methods:
+    - X-RAY DIFFRACTION
+  max_resolution_angstrom: 2.5
+  min_length: 1
+  max_length: 10000
+  sequence_identity:
+    method: not-applied-demo
+    threshold: 1.0
+  require_complete_backbone: false
+  allow_modified_residues: true
+  allow_altlocs: true
+  allow_insertion_codes: true
+geometry:
+  store_angles:
+    - omega
+    - tau
+    - theta
+  store_lengths: protein-heavy
+  store_chi: all
+  reconstruction_mode: pheat-default
+scoring:
+  profiles:
+    - generic
+  burial_methods:
+    - contacts
+decoys:
+  enabled: true
+  recipe: pheat-coordinate-noise-v1
+  n_per_native: 2
+  seed: 20260529
+outputs:
+  include_manifest: true
+  include_features: false
+  include_score_tables: false
+  include_decoys: false
+  compression: none
+provenance:
+  pheat_version: 0.1.0
+  created_by: PHEAT paper-0 demo workflow
+  notes: Demo only; do not cite as scientific benchmark evidence.

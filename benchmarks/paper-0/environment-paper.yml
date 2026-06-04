@@ -1,0 +1,26 @@
+name: pheat-paper-0
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - ambertools
+  - biopython
+  - freesasa
+  - gemmi
+  - gromacs
+  - jsonschema
+  - mdanalysis
+  - mdtraj
+  - pyyaml
+  - numpy
+  - openmm
+  - pdbfixer
+  - pytest
+  - reportlab
+  - scipy
+  - pip
+  - pip:
+      # Conda-forge does not provide these packages for this local setup.
+      - PeptideBuilder==1.1.0
+      - pulchra==1.0.1
+      - -e ../..

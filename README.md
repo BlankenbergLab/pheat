@@ -1072,3 +1072,22 @@ Related docs:
 - `docs/corpus-specs.md`
 - `docs/reference-manifests.md`
 - `docs/ccd-heterogen-annotation.md`
+
+## paper-0 Draft
+
+The `paper-0-draft` branch adds a paper-specific benchmark scaffold and draft
+assembly workflow under `benchmarks/paper-0/`. The tiny demo uses only local
+fixtures and is a workflow check, not scientific benchmark evidence:
+
+```bash
+make -C benchmarks/paper-0 reproduce-demo
+make -C benchmarks/paper-0 pdf-demo
+```
+
+Related paper-0 docs:
+
+- `benchmarks/paper-0/README.md`
+- `docs/paper-0-submission-readiness.md`
+- `docs/paper/paper-0-outline.md`
+- `docs/reconstruction-benchmarks.md`
+- `docs/scoring-benchmarks.md`
