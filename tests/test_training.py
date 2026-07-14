@@ -1062,6 +1062,9 @@ class TrainingCommandTests(unittest.TestCase):
             "rotamer",
             "aromatic",
             "ramachandran",
+            "omega",
+            "omega_window_penalty",
+            "hard_clash",
             "geometry_integrity",
             "adjacent_heavy_sterics",
             "total",
@@ -1070,13 +1073,20 @@ class TrainingCommandTests(unittest.TestCase):
         self.assertEqual(score.metadata["input_contract"]["id"], "pheat.score-contract.pheat-coarse-protein-folding-v1.v1")
         self.assertEqual(score.metadata["charge_profile"], "protein-coarse-charge-v1")
         self.assertEqual(score.metadata["decoded_torsion_count"], 5)
+        self.assertEqual(score.terms["omega_window_penalty"], 0.0)
+        self.assertIn("hard_clash_min_dist", score.metadata)
+        self.assertIn("hard_clash_count", score.metadata)
 
         models = {item["model"] for item in model_capabilities()}
         self.assertIn("pheat-coarse-protein-folding-v1", models)
         specs = {item["name"]: item for item in score_model_option_specs("pheat-coarse-protein-folding-v1")}
         self.assertIn("decoded_torsions", specs)
         self.assertIn("hydrophobic_gamma", specs)
+        self.assertIn("hydrophobic_burial_denominator", specs)
+        self.assertIn("hydrophobic_burial_scale", specs)
         self.assertIn("end_to_end_weight", specs)
+        self.assertIn("omega_window_scale", specs)
+        self.assertIn("hard_clash_scale", specs)
 
     def test_pheat_coarse_protein_folding_options_and_torsion_cleanup(self):
         structure = structure_from_residue_geometry(residue_geometry_structure_from_sequence("AP"))
@@ -1115,6 +1125,63 @@ class TrainingCommandTests(unittest.TestCase):
         self.assertEqual(scaled.metadata["decoded_torsion_count"], 1)
         self.assertEqual(scaled.metadata["ignored_decoded_torsion_count"], 2)
         self.assertTrue(any("ignored non-numeric or non-finite decoded torsion" in item for item in scaled.warnings))
+
+        hydrophobic_structure = structure_from_residue_geometry(residue_geometry_structure_from_sequence("VV"))
+        default_burial = score_structure(
+            hydrophobic_structure,
+            model="pheat-coarse-protein-folding-v1",
+            hydrophobic_gamma=15.0,
+        )
+        qtf_main_burial = score_structure(
+            hydrophobic_structure,
+            model="pheat-coarse-protein-folding-v1",
+            hydrophobic_gamma=15.0,
+            hydrophobic_burial_denominator=35.0,
+            hydrophobic_burial_scale=0.7,
+        )
+        self.assertEqual(qtf_main_burial.metadata["hydrophobic_burial_denominator"], 35.0)
+        self.assertEqual(qtf_main_burial.metadata["hydrophobic_burial_scale"], 0.7)
+        self.assertEqual(qtf_main_burial.metadata["weights"]["hydrophobic_burial"], 10.5)
+        self.assertNotEqual(default_burial.terms["hydrophobic_burial"], qtf_main_burial.terms["hydrophobic_burial"])
+
+        capped = score_structure(
+            structure,
+            model="pheat-coarse-protein-folding-v1",
+            decoded_torsions={
+                "0_phi": -1.0,
+                "1_chi4": 0.5,
+                "1_chi5": 1.0,
+                "0_omega": math.radians(120.0),
+            },
+        )
+        self.assertEqual(capped.metadata["decoded_torsion_count"], 2)
+        self.assertEqual(capped.metadata["ignored_decoded_torsion_count"], 2)
+        self.assertTrue(any("ignored non-numeric or non-finite decoded torsion" in item for item in capped.warnings))
+        self.assertGreater(capped.terms["omega_window_penalty"], 0.0)
+
+        for omega_degrees in (175.0, 180.0, 185.0):
+            in_window = score_structure(
+                structure,
+                model="pheat-coarse-protein-folding-v1",
+                decoded_torsions={"0_omega": math.radians(omega_degrees)},
+            )
+            self.assertEqual(in_window.terms["omega_window_penalty"], 0.0)
+
+        capped_residue_chis = score_structure(
+            structure_from_residue_geometry(residue_geometry_structure_from_sequence("LDE")),
+            model="pheat-coarse-protein-folding-v1",
+            decoded_torsions={
+                "0_chi1": 0.1,
+                "0_chi2": 0.2,
+                "1_chi1": 0.3,
+                "1_chi2": 0.4,
+                "2_chi1": 0.5,
+                "2_chi2": 0.6,
+                "2_chi3": 0.7,
+            },
+        )
+        self.assertEqual(capped_residue_chis.metadata["decoded_torsion_count"], 4)
+        self.assertEqual(capped_residue_chis.metadata["ignored_decoded_torsion_count"], 3)
 
         valid = validate_scoring_options(
             "pheat-coarse-protein-folding-v1",

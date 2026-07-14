@@ -9,6 +9,7 @@ from unittest import mock
 import pheat
 from pheat.archive import HttpPayload
 from pheat.cli import _build_parser, _emit_startup_status, main as cli_main
+from pheat.scoring import _run_subprocess
 
 
 def _capture_cli(args):
@@ -297,6 +298,29 @@ class CliStatusTests(unittest.TestCase):
         self.assertIn("archive snapshot: rcsb-current-bcif", stderr)
         self.assertIn("archive staging dir: ./pheat-bcif-staging", stderr)
         self.assertIn("fetching current RCSB/wwPDB holdings", stderr)
+
+    def test_run_subprocess_emits_a_heartbeat_for_long_calls(self):
+        class CaptureStream:
+            def __init__(self):
+                self.lines = []
+
+            def status(self, message):
+                self.lines.append(message)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            stream = CaptureStream()
+            result = _run_subprocess(
+                ["python", "-c", "import time; time.sleep(0.2); print('done')"],
+                cwd=Path(tmpdir),
+                status_stream=stream,
+                status_label="test subprocess",
+                heartbeat_seconds=0.05,
+            )
+
+        self.assertEqual(result.returncode, 0)
+        self.assertTrue(stream.lines[0].startswith("test subprocess started"))
+        self.assertTrue(any("heartbeat" in line for line in stream.lines))
+        self.assertTrue(any("completed" in line for line in stream.lines))
 
 
 if __name__ == "__main__":

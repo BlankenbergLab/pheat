@@ -2383,6 +2383,7 @@ def _cmd_score(args: argparse.Namespace) -> int:
         decoded_torsions=decoded_torsions,
         use_end_to_end_constraint=not args.disable_end_to_end_constraint,
         end_to_end_scale=args.end_to_end_scale,
+        status_stream=_status_stream(args),
     )
     if args.output:
         _write_model_json(args.output, result.to_json())
@@ -2429,6 +2430,7 @@ def _cmd_gromacs_prepare(args: argparse.Namespace) -> int:
         external_timeout_seconds=args.external_timeout,
         prep_cache_dir=args.prep_cache_dir,
         prep_cache_mode=args.prep_cache_mode,
+        status_stream=_status_stream(args),
     )
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
@@ -2518,6 +2520,7 @@ def _score_with_gromacs_args(
         external_timeout_seconds=args.external_timeout,
         prep_cache_dir=args.prep_cache_dir,
         prep_cache_mode=args.prep_cache_mode,
+        status_stream=_status_stream(args),
     )
 
 

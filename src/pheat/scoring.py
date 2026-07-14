@@ -17,6 +17,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import time
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 from pheat.domains import filter_structure_for_domain, merge_coverage_metadata
@@ -136,6 +137,27 @@ PHYSICAL_INTEGRITY_WEIGHT_DEFAULT = 1000.0
 GOAP_PHYSICAL_INTEGRITY_WEIGHT_DEFAULT = 0.005
 HYDROPATHY_PHYSICAL_INTEGRITY_WEIGHT_DEFAULT = 0.0001
 BACKBONE_PHYSICAL_INTEGRITY_WEIGHT_DEFAULT = 0.001
+COARSE_OMEGA_WINDOW_MIN_DEG = 170.0
+COARSE_OMEGA_WINDOW_MAX_DEG = 190.0
+COARSE_OMEGA_WINDOW_SCALE_DEFAULT = 25.0
+COARSE_OMEGA_SCALE_DEFAULT = 1.0
+COARSE_HARD_CLASH_MIN_A_DEFAULT = 1.20
+COARSE_HARD_CLASH_SCALE_DEFAULT = 5000.0
+COARSE_HARD_CLASH_POWER_DEFAULT = 4.0
+COARSE_HARD_CLASH_14_SCALE_DEFAULT = 0.25
+COARSE_CHI_CAP_BY_RESIDUE = {
+    "CYS": 1,
+    "ASP": 1,
+    "GLU": 2,
+    "SER": 1,
+    "THR": 1,
+    "VAL": 1,
+    "ILE": 2,
+    "LEU": 1,
+    "MET": 3,
+    "LYS": 4,
+    "ARG": 4,
+}
 OPENMM_PREPARATION_SEED = 20260514
 
 RESIDUE_HYDROPHOBICITY = {
@@ -568,8 +590,16 @@ def _score_model_option_specs(model: str) -> list[dict[str, Any]]:
             specs.extend(
                 [
                     _option_spec("decoded_torsions", "mapping", None, "Optional decoded torsion angles in radians keyed as residueIndex_angleName, for example 3_phi or 3_chi1."),
+                    _option_spec("hydrophobic_burial_denominator", "float", 15.0, "Neighbor-count denominator for coarse hydrophobic burial saturation."),
+                    _option_spec("hydrophobic_burial_scale", "float", 1.0, "Scale applied to the coarse hydrophobic burial penalty."),
                     _option_spec("use_end_to_end_constraint", "boolean", True, "Whether to apply the end-to-end compactness restraint."),
                     _option_spec("end_to_end_scale", "float", 1.0, "Additional scale multiplier for the end-to-end compactness restraint."),
+                    _option_spec("omega_weight", "float", COARSE_OMEGA_SCALE_DEFAULT, "Omega preference weight used for decoded torsion scoring."),
+                    _option_spec("omega_window_scale", "float", COARSE_OMEGA_WINDOW_SCALE_DEFAULT, "Penalty scale for omega values outside the trans window."),
+                    _option_spec("hard_clash_min_A", "float", COARSE_HARD_CLASH_MIN_A_DEFAULT, "Minimum heavy-atom distance before the coarse hard-clash wall activates."),
+                    _option_spec("hard_clash_scale", "float", COARSE_HARD_CLASH_SCALE_DEFAULT, "Scale factor for the coarse hard-clash wall."),
+                    _option_spec("hard_clash_power", "float", COARSE_HARD_CLASH_POWER_DEFAULT, "Power used by the coarse hard-clash wall."),
+                    _option_spec("hard_clash_14_scale", "float", COARSE_HARD_CLASH_14_SCALE_DEFAULT, "Relative scale applied to graph-distance-3 pairs in the coarse hard-clash wall."),
                 ]
             )
     if model == "ambertools-sander":
@@ -904,6 +934,8 @@ def score_structure(
     physical_integrity_weight: Optional[float] = None,
     charge_profile: str = "protein-coarse-charge-v1",
     hydrophobic_gamma: float = 15.0,
+    hydrophobic_burial_denominator: float = 15.0,
+    hydrophobic_burial_scale: float = 1.0,
     end_to_end_weight: float = 50.0,
     end_to_end_target: Optional[float] = None,
     end_to_end_slack: Optional[float] = None,
@@ -916,9 +948,16 @@ def score_structure(
     pi_stacking_weight: float = 1.0,
     geometry_integrity_weight: float = 1.0,
     adjacent_heavy_steric_weight: float = 1.0,
+    omega_weight: float = COARSE_OMEGA_SCALE_DEFAULT,
+    omega_window_scale: float = COARSE_OMEGA_WINDOW_SCALE_DEFAULT,
+    hard_clash_min_A: float = COARSE_HARD_CLASH_MIN_A_DEFAULT,
+    hard_clash_scale: float = COARSE_HARD_CLASH_SCALE_DEFAULT,
+    hard_clash_power: float = COARSE_HARD_CLASH_POWER_DEFAULT,
+    hard_clash_14_scale: float = COARSE_HARD_CLASH_14_SCALE_DEFAULT,
     decoded_torsions: Optional[Mapping[str, Any]] = None,
     use_end_to_end_constraint: bool = True,
     end_to_end_scale: float = 1.0,
+    status_stream: Optional[Any] = None,
 ) -> EnergyResult:
     """Score an atom structure with an explicitly named backend."""
 
@@ -1114,6 +1153,8 @@ def score_structure(
                 filtered,
                 charge_profile=charge_profile,
                 hydrophobic_gamma=hydrophobic_gamma,
+                hydrophobic_burial_denominator=hydrophobic_burial_denominator,
+                hydrophobic_burial_scale=hydrophobic_burial_scale,
                 end_to_end_weight=end_to_end_weight,
                 end_to_end_target=end_to_end_target,
                 end_to_end_slack=end_to_end_slack,
@@ -1126,6 +1167,12 @@ def score_structure(
                 pi_stacking_weight=pi_stacking_weight,
                 geometry_integrity_weight=geometry_integrity_weight,
                 adjacent_heavy_steric_weight=adjacent_heavy_steric_weight,
+                omega_weight=omega_weight,
+                omega_window_scale=omega_window_scale,
+                hard_clash_min_A=hard_clash_min_A,
+                hard_clash_scale=hard_clash_scale,
+                hard_clash_power=hard_clash_power,
+                hard_clash_14_scale=hard_clash_14_scale,
                 decoded_torsions=decoded_torsions,
                 use_end_to_end_constraint=use_end_to_end_constraint,
                 end_to_end_scale=end_to_end_scale,
@@ -1205,6 +1252,7 @@ def score_structure(
                 external_timeout_seconds=external_timeout_seconds,
                 prep_cache_dir=Path(prep_cache_dir) if prep_cache_dir is not None else None,
                 prep_cache_mode=prep_cache_mode,
+                status_stream=status_stream,
             ),
             coverage,
             contract=contract,
@@ -1990,6 +2038,8 @@ def _score_pheat_physics(
     *,
     charge_profile: str = "protein-coarse-charge-v1",
     hydrophobic_gamma: float = 15.0,
+    hydrophobic_burial_denominator: float = 15.0,
+    hydrophobic_burial_scale: float = 1.0,
     end_to_end_weight: float = 50.0,
     end_to_end_target: Optional[float] = None,
     end_to_end_slack: Optional[float] = None,
@@ -2145,6 +2195,8 @@ def _score_pheat_coarse_protein_folding_v1(
     *,
     charge_profile: str = "protein-coarse-charge-v1",
     hydrophobic_gamma: float = 15.0,
+    hydrophobic_burial_denominator: float = 15.0,
+    hydrophobic_burial_scale: float = 1.0,
     end_to_end_weight: float = 50.0,
     end_to_end_target: Optional[float] = None,
     end_to_end_slack: Optional[float] = None,
@@ -2157,6 +2209,12 @@ def _score_pheat_coarse_protein_folding_v1(
     pi_stacking_weight: float = 1.0,
     geometry_integrity_weight: float = 1.0,
     adjacent_heavy_steric_weight: float = 1.0,
+    omega_weight: float = COARSE_OMEGA_SCALE_DEFAULT,
+    omega_window_scale: float = COARSE_OMEGA_WINDOW_SCALE_DEFAULT,
+    hard_clash_min_A: float = COARSE_HARD_CLASH_MIN_A_DEFAULT,
+    hard_clash_scale: float = COARSE_HARD_CLASH_SCALE_DEFAULT,
+    hard_clash_power: float = COARSE_HARD_CLASH_POWER_DEFAULT,
+    hard_clash_14_scale: float = COARSE_HARD_CLASH_14_SCALE_DEFAULT,
     decoded_torsions: Optional[Mapping[str, Any]] = None,
     use_end_to_end_constraint: bool = True,
     end_to_end_scale: float = 1.0,
@@ -2184,7 +2242,7 @@ def _score_pheat_coarse_protein_folding_v1(
     terminal_residue_keys = _terminal_residue_keys_by_chain(residues)
     target = float(end_to_end_target) if end_to_end_target is not None else 4.5 + 0.40 * max(0, len(residues) - 5)
     slack = float(end_to_end_slack) if end_to_end_slack is not None else 1.5 + 0.05 * len(residues)
-    torsions, ignored_torsions = _normalize_decoded_torsions(decoded_torsions)
+    torsions, ignored_torsions = _normalize_decoded_torsions(decoded_torsions, residue_keys=residues)
     warnings = _unsupported_warnings(structure)
     if ignored_torsions:
         warnings.append(f"ignored non-numeric or non-finite decoded torsion values: {ignored_torsions}")
@@ -2199,6 +2257,9 @@ def _score_pheat_coarse_protein_folding_v1(
         "rotamer": 0.0,
         "aromatic": 0.0,
         "ramachandran": 0.0,
+        "omega": 0.0,
+        "omega_window_penalty": 0.0,
+        "hard_clash": 0.0,
         "geometry_integrity": 0.0,
         "adjacent_heavy_sterics": 0.0,
     }
@@ -2209,7 +2270,12 @@ def _score_pheat_coarse_protein_folding_v1(
         deviation = max(0.0, abs(dist_ends - target) - slack)
         terms["end_to_end"] = float(end_to_end_scale) * float(end_to_end_weight) * deviation * deviation
 
-    terms["hydrophobic_burial"] = _coarse_hydrophobic_burial_term(structure, hydrophobic_gamma=float(hydrophobic_gamma))
+    terms["hydrophobic_burial"] = _coarse_hydrophobic_burial_term(
+        structure,
+        hydrophobic_gamma=float(hydrophobic_gamma),
+        burial_denominator=float(hydrophobic_burial_denominator),
+        burial_scale=float(hydrophobic_burial_scale),
+    )
     terms["hbond"] = float(hbond_weight) * _coarse_hbond_term(structure, residue_index=residue_index)
     terms["electrostatic"] = float(electrostatic_weight) * _coarse_electrostatic_term(
         structure,
@@ -2222,6 +2288,16 @@ def _score_pheat_coarse_protein_folding_v1(
     terms["rotamer"] = float(rotamer_weight) * _coarse_rotamer_term(residues, torsions)
     terms["aromatic"] = float(pi_stacking_weight) * _pheat_physics_pi_stacking(structure)
     terms["ramachandran"] = float(backbone_weight) * _coarse_ramachandran_term(residues, torsions)
+    terms["omega"] = float(omega_weight) * _coarse_omega_term(residues, torsions)
+    terms["omega_window_penalty"] = float(omega_window_scale) * _coarse_omega_window_penalty(residues, torsions)
+    hard_clash_value, hard_clash_diagnostics = _coarse_hard_clash_term(
+        structure,
+        hard_clash_min_A=float(hard_clash_min_A),
+        hard_clash_scale=float(hard_clash_scale),
+        hard_clash_power=float(hard_clash_power),
+        hard_clash_14_scale=float(hard_clash_14_scale),
+    )
+    terms["hard_clash"] = hard_clash_value
     geometry = _score_pheat_geometry_integrity(structure)
     terms["geometry_integrity"] = float(geometry_integrity_weight) * float(geometry.total)
     adjacent = _pheat_physics_adjacent_heavy_sterics(structure)
@@ -2231,7 +2307,7 @@ def _score_pheat_coarse_protein_folding_v1(
     terms["total"] = total
     weights = {
         "end_to_end": float(end_to_end_weight) * float(end_to_end_scale),
-        "hydrophobic_burial": float(hydrophobic_gamma),
+        "hydrophobic_burial": float(hydrophobic_gamma) * float(hydrophobic_burial_scale),
         "hbond": float(hbond_weight),
         "electrostatic": float(electrostatic_weight),
         "disulfide": float(disulfide_weight),
@@ -2241,6 +2317,12 @@ def _score_pheat_coarse_protein_folding_v1(
         "aromatic": float(pi_stacking_weight),
         "geometry_integrity": float(geometry_integrity_weight),
         "adjacent_heavy_sterics": float(adjacent_heavy_steric_weight),
+        "omega": float(omega_weight),
+        "omega_window_penalty": float(omega_window_scale),
+        "hard_clash_min_A": float(hard_clash_min_A),
+        "hard_clash_scale": float(hard_clash_scale),
+        "hard_clash_power": float(hard_clash_power),
+        "hard_clash_14_scale": float(hard_clash_14_scale),
     }
     return EnergyResult(
         model="pheat-coarse-protein-folding-v1",
@@ -2258,7 +2340,10 @@ def _score_pheat_coarse_protein_folding_v1(
             "use_end_to_end_constraint": bool(use_end_to_end_constraint),
             "end_to_end_scale": float(end_to_end_scale),
             "hydrophobic_gamma": float(hydrophobic_gamma),
+            "hydrophobic_burial_denominator": float(hydrophobic_burial_denominator),
+            "hydrophobic_burial_scale": float(hydrophobic_burial_scale),
             "end_to_end_weight": float(end_to_end_weight),
+            **hard_clash_diagnostics,
             "weights": weights,
             "decoded_torsion_count": len(torsions),
             "ignored_decoded_torsion_count": ignored_torsions,
@@ -2276,12 +2361,18 @@ def _coarse_nonfinite_coordinate_count(structure: HeavyAtomStructure) -> int:
     return count
 
 
-def _normalize_decoded_torsions(decoded_torsions: Optional[Mapping[str, Any]]) -> tuple[dict[str, float], int]:
+def _normalize_decoded_torsions(
+    decoded_torsions: Optional[Mapping[str, Any]],
+    *,
+    residue_keys: Optional[Sequence[tuple[str, int, str, str, str]]] = None,
+) -> tuple[dict[str, float], int]:
     if not decoded_torsions:
         return {}, 0
     torsions: dict[str, float] = {}
+    allowed_chi_by_residue = _allowed_decoded_chi_by_residue(residue_keys or [])
     ignored = 0
     for key, value in decoded_torsions.items():
+        normalized_key = str(key).strip().lower()
         try:
             normalized = float(value)
         except (TypeError, ValueError):
@@ -2290,7 +2381,10 @@ def _normalize_decoded_torsions(decoded_torsions: Optional[Mapping[str, Any]]) -
         if not math.isfinite(normalized):
             ignored += 1
             continue
-        torsions[str(key).strip().lower()] = normalized
+        if not _is_supported_decoded_torsion_key(normalized_key, allowed_chi_by_residue=allowed_chi_by_residue):
+            ignored += 1
+            continue
+        torsions[normalized_key] = normalized
     return torsions, ignored
 
 
@@ -2300,6 +2394,54 @@ def _decoded_torsion(torsions: Mapping[str, float], residue_index: int, name: st
     if value is None or not math.isfinite(value):
         return None
     return float(value)
+
+
+def _is_supported_decoded_torsion_key(
+    key: str,
+    *,
+    allowed_chi_by_residue: Optional[Mapping[int, set[str]]] = None,
+) -> bool:
+    if "_" not in key:
+        return False
+    residue_index, angle_name = key.split("_", 1)
+    if not residue_index.isdigit():
+        return False
+    res_idx = int(residue_index)
+    angle_name = angle_name.strip().lower()
+    if angle_name in {"phi", "psi", "omega", "tau", "theta"}:
+        return True
+    if angle_name.startswith("chi") and angle_name[3:].isdigit():
+        chi_index = int(angle_name[3:])
+        if not 1 <= chi_index <= 4:
+            return False
+        if allowed_chi_by_residue is None:
+            return True
+        return angle_name in allowed_chi_by_residue.get(res_idx, set())
+    return False
+
+
+def _allowed_decoded_chi_by_residue(
+    residue_keys: Sequence[tuple[str, int, str, str, str]],
+) -> dict[int, set[str]]:
+    allowed: dict[int, set[str]] = {}
+    for index, residue_key in enumerate(residue_keys):
+        resname = residue_key[3].strip().upper()
+        chi_names: set[str] = set()
+        for step in SIDECHAIN_STEPS.get(resname, []):
+            dihedral = step.dihedral
+            if isinstance(dihedral, str) and dihedral.startswith("chi"):
+                chi_names.add(dihedral.lower())
+            elif isinstance(dihedral, tuple) and dihedral and isinstance(dihedral[0], str) and dihedral[0].startswith("chi"):
+                chi_names.add(dihedral[0].lower())
+        cap = COARSE_CHI_CAP_BY_RESIDUE.get(resname)
+        if cap is not None:
+            chi_names = {
+                name
+                for name in chi_names
+                if name.startswith("chi") and name[3:].isdigit() and int(name[3:]) <= cap
+            }
+        allowed[index] = chi_names
+    return allowed
 
 
 def _coarse_residue_one_letter(residue_key: tuple[str, int, str, str, str]) -> str:
@@ -2312,7 +2454,13 @@ def _sigmoid_contact(distance_value: float, midpoint: float = 6.0) -> float:
     return 1.0 / (1.0 + math.exp(x))
 
 
-def _coarse_hydrophobic_burial_term(structure: HeavyAtomStructure, *, hydrophobic_gamma: float) -> float:
+def _coarse_hydrophobic_burial_term(
+    structure: HeavyAtomStructure,
+    *,
+    hydrophobic_gamma: float,
+    burial_denominator: float = 15.0,
+    burial_scale: float = 1.0,
+) -> float:
     hydrophobic_residues = {"ALA", "VAL", "LEU", "ILE", "MET", "PHE", "TRP", "PRO", "CYS"}
     hydrophobic_atoms = []
     for atom in structure.atoms:
@@ -2335,8 +2483,9 @@ def _coarse_hydrophobic_burial_term(structure: HeavyAtomStructure, *, hydrophobi
             if other is atom:
                 continue
             neighbor_count += _sigmoid_contact(distance(atom.coord, other.coord), midpoint=6.0)
-        burial_fraction = min(max(neighbor_count / 15.0, 0.0), 1.0)
-        energy += float(hydrophobic_gamma) * 30.0 * (1.0 - burial_fraction)
+        denominator = max(float(burial_denominator), 1e-9)
+        burial_fraction = min(max(neighbor_count / denominator, 0.0), 1.0)
+        energy += float(burial_scale) * float(hydrophobic_gamma) * 30.0 * (1.0 - burial_fraction)
     return float(energy)
 
 
@@ -2415,6 +2564,98 @@ def _coarse_electrostatic_term(
             r = max(distance(atom_a.coord, structure.atoms[j].coord), 1.0)
             energy += 332.0637 * product / (4.0 * r)
     return float(energy)
+
+
+def _coarse_omega_term(
+    residue_keys: Sequence[tuple[str, int, str, str, str]],
+    torsions: Mapping[str, float],
+) -> float:
+    omega_min = math.radians(COARSE_OMEGA_WINDOW_MIN_DEG)
+    omega_max = math.radians(COARSE_OMEGA_WINDOW_MAX_DEG)
+    omega_center = math.pi
+    omega_half_width = 0.5 * (omega_max - omega_min)
+    energy = 0.0
+    for index, _ in enumerate(residue_keys[:-1]):
+        omega = _decoded_torsion(torsions, index, "omega")
+        if omega is None:
+            continue
+        val = float(omega)
+        if not math.isfinite(val):
+            continue
+        if -omega_max <= val <= -omega_min:
+            val = (2.0 * math.pi) + val
+        val = min(max(val, omega_min), omega_max)
+        delta = val - omega_center
+        energy += (delta / max(omega_half_width, 1e-9)) ** 2
+    return float(energy)
+
+
+def _coarse_omega_window_penalty(
+    residue_keys: Sequence[tuple[str, int, str, str, str]],
+    torsions: Mapping[str, float],
+) -> float:
+    omega_min = math.radians(COARSE_OMEGA_WINDOW_MIN_DEG)
+    omega_max = math.radians(COARSE_OMEGA_WINDOW_MAX_DEG)
+    omega_half_width = 0.5 * (omega_max - omega_min)
+    energy = 0.0
+    for index, _ in enumerate(residue_keys[:-1]):
+        omega = _decoded_torsion(torsions, index, "omega")
+        if omega is None:
+            continue
+        val = float(omega)
+        if not math.isfinite(val):
+            continue
+        if omega_min <= val <= omega_max or -math.pi <= val <= -omega_min:
+            continue
+        if 0.0 <= val < omega_min:
+            deviation = omega_min - val
+        elif val > math.pi:
+            deviation = min(abs(val - math.pi), abs(val - omega_max))
+        elif -omega_min < val < 0.0:
+            deviation = omega_min + val
+        else:
+            deviation = abs(abs(val) - math.pi)
+        energy += float((deviation / max(omega_half_width, 1e-9)) ** 2)
+    return float(energy)
+
+
+def _coarse_hard_clash_term(
+    structure: HeavyAtomStructure,
+    *,
+    hard_clash_min_A: float,
+    hard_clash_scale: float,
+    hard_clash_power: float,
+    hard_clash_14_scale: float,
+) -> tuple[float, dict[str, float]]:
+    graph_dist = _coarse_graph_distances_up_to_three(structure)
+    atoms = structure.atoms
+    energy = 0.0
+    min_dist = math.inf
+    count = 0
+    for i, atom_a in enumerate(atoms[:-1]):
+        if atom_a.element.strip().upper() in {"H", "D", "T"}:
+            continue
+        for j in range(i + 1, len(atoms)):
+            atom_b = atoms[j]
+            if atom_b.element.strip().upper() in {"H", "D", "T"}:
+                continue
+            path = graph_dist.get((i, j), 99)
+            if path <= 2:
+                continue
+            pair_scale = float(hard_clash_14_scale) if path == 3 else 1.0
+            dist = distance(atom_a.coord, atom_b.coord)
+            shortfall = max(0.0, float(hard_clash_min_A) - dist)
+            if shortfall <= 0.0:
+                continue
+            min_dist = min(min_dist, float(dist))
+            count += 1
+            denom = max(float(hard_clash_min_A), 1e-6)
+            energy += float(hard_clash_scale) * pair_scale * (shortfall / denom) ** float(hard_clash_power)
+    diagnostics = {
+        "hard_clash_min_dist": float(min_dist) if math.isfinite(min_dist) else 0.0,
+        "hard_clash_count": float(count),
+    }
+    return float(energy), diagnostics
 
 
 def _coarse_disulfide_term(structure: HeavyAtomStructure) -> float:
@@ -3019,6 +3260,7 @@ def prepare_gromacs_structure(
     external_timeout_seconds: Optional[float] = None,
     prep_cache_dir: Optional[Union[str, Path]] = None,
     prep_cache_mode: str = "off",
+    status_stream: Optional[Any] = None,
 ) -> dict[str, Any]:
     """Prepare a GROMACS coordinate/topology pair without running an energy calculation."""
 
@@ -3044,6 +3286,7 @@ def prepare_gromacs_structure(
             timeout=timeout,
             prep_cache_dir=Path(prep_cache_dir) if prep_cache_dir is not None else None,
             prep_cache_mode=cache_mode,
+            status_stream=status_stream,
         )
         output_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(prepared["coordinate_path"], output_path)
@@ -3145,6 +3388,7 @@ def _score_gromacs_mdrun(
     external_timeout_seconds: Optional[float] = None,
     prep_cache_dir: Optional[Path] = None,
     prep_cache_mode: str = "off",
+    status_stream: Optional[Any] = None,
 ) -> EnergyResult:
     """Run a GROMACS topology-prepared energy check for validation/reranking."""
 
@@ -3182,6 +3426,7 @@ def _score_gromacs_mdrun(
             timeout=timeout,
             prep_cache_dir=prep_cache_dir,
             prep_cache_mode=cache_mode,
+            status_stream=status_stream,
         )
         energy = _run_gromacs_energy_workflow(
             gmx,
@@ -3192,6 +3437,7 @@ def _score_gromacs_mdrun(
             metrics=gromacs_metrics,
             settings=settings,
             timeout=timeout,
+            status_stream=status_stream,
         )
         final_coordinate = energy["final_coordinate_path"]
         if prepared_output is not None:
@@ -3675,6 +3921,7 @@ def _prepare_gromacs_system(
     timeout: Optional[float],
     prep_cache_dir: Optional[Path],
     prep_cache_mode: str,
+    status_stream: Optional[Any] = None,
 ) -> dict[str, Any]:
     prepare_mode = _normalize_prepare_mode(prepare)
     forcefield = _normalize_gromacs_forcefield(gromacs_forcefield)
@@ -3728,7 +3975,15 @@ def _prepare_gromacs_system(
             water,
             "-ignh",
         ]
-        _run_subprocess(pdb2gmx_command, cwd=work_dir, input_text="\n", timeout=timeout)
+        _status_print(status_stream, "GROMACS prep: pdb2gmx")
+        _run_subprocess(
+            pdb2gmx_command,
+            cwd=work_dir,
+            input_text="\n",
+            timeout=timeout,
+            status_stream=status_stream,
+            status_label="GROMACS pdb2gmx",
+        )
         if not prepared_gro.exists() or not topology.exists():
             raise RuntimeError("GROMACS pdb2gmx did not produce prepared.gro/topol.top.")
         command_lines["pdb2gmx"] = pdb2gmx_command
@@ -3747,7 +4002,14 @@ def _prepare_gromacs_system(
         "-bt",
         "dodecahedron",
     ]
-    _run_subprocess(editconf_command, cwd=work_dir, timeout=timeout)
+    _status_print(status_stream, "GROMACS prep: editconf")
+    _run_subprocess(
+        editconf_command,
+        cwd=work_dir,
+        timeout=timeout,
+        status_stream=status_stream,
+        status_label="GROMACS editconf",
+    )
     if not boxed.exists():
         raise RuntimeError("GROMACS editconf did not produce boxed.gro.")
     coordinate = boxed
@@ -3766,7 +4028,14 @@ def _prepare_gromacs_system(
             "-p",
             str(topology.name),
         ]
-        _run_subprocess(solvate_command, cwd=work_dir, timeout=timeout)
+        _status_print(status_stream, "GROMACS prep: solvate")
+        _run_subprocess(
+            solvate_command,
+            cwd=work_dir,
+            timeout=timeout,
+            status_stream=status_stream,
+            status_label="GROMACS solvate",
+        )
         if not solvated.exists():
             raise RuntimeError("GROMACS solvate did not produce solvated.gro.")
         coordinate = solvated
@@ -3802,6 +4071,7 @@ def _run_gromacs_energy_workflow(
     metrics: bool,
     settings: GromacsRunSettings,
     timeout: Optional[float],
+    status_stream: Optional[Any] = None,
 ) -> dict[str, Any]:
     command_lines: dict[str, list[str]] = {}
     warnings: list[str] = []
@@ -3810,6 +4080,7 @@ def _run_gromacs_energy_workflow(
     energy_edr = work_dir / "rerun.edr"
 
     if run_mode in {"minimize", "minimize-rerun"}:
+        _status_print(status_stream, "GROMACS minimize: preparing")
         minimize_mdp = _write_gromacs_mdp(work_dir, mode="minimize", settings=settings)
         minimize_tpr = work_dir / "minimize.tpr"
         grompp_minimize = [
@@ -3826,10 +4097,22 @@ def _run_gromacs_energy_workflow(
         ]
         if settings.grompp_maxwarn:
             grompp_minimize.extend(["-maxwarn", str(settings.grompp_maxwarn)])
-        _run_subprocess(grompp_minimize, cwd=work_dir, timeout=timeout)
+        _run_subprocess(
+            grompp_minimize,
+            cwd=work_dir,
+            timeout=timeout,
+            status_stream=status_stream,
+            status_label="GROMACS grompp minimize",
+        )
         mdrun_minimize = [gmx, "mdrun", "-deffnm", "minimize", "-s", str(minimize_tpr.name)]
         mdrun_minimize.extend(settings.mdrun_flags)
-        _run_subprocess(mdrun_minimize, cwd=work_dir, timeout=timeout)
+        _run_subprocess(
+            mdrun_minimize,
+            cwd=work_dir,
+            timeout=timeout,
+            status_stream=status_stream,
+            status_label="GROMACS mdrun minimize",
+        )
         minimized = work_dir / "minimize.gro"
         if not minimized.exists():
             raise RuntimeError("GROMACS mdrun minimization did not produce minimize.gro.")
@@ -3840,6 +4123,7 @@ def _run_gromacs_energy_workflow(
         command_lines["mdrun_minimize"] = mdrun_minimize
 
     if run_mode in {"rerun", "minimize-rerun"}:
+        _status_print(status_stream, "GROMACS rerun: preparing")
         rerun_mdp = _write_gromacs_mdp(work_dir, mode="rerun", settings=settings)
         rerun_tpr = work_dir / "rerun.tpr"
         grompp_rerun = [
@@ -3856,7 +4140,13 @@ def _run_gromacs_energy_workflow(
         ]
         if settings.grompp_maxwarn:
             grompp_rerun.extend(["-maxwarn", str(settings.grompp_maxwarn)])
-        _run_subprocess(grompp_rerun, cwd=work_dir, timeout=timeout)
+        _run_subprocess(
+            grompp_rerun,
+            cwd=work_dir,
+            timeout=timeout,
+            status_stream=status_stream,
+            status_label="GROMACS grompp rerun",
+        )
         mdrun_rerun = [
             gmx,
             "mdrun",
@@ -3868,7 +4158,13 @@ def _run_gromacs_energy_workflow(
             str(final_coordinate.name),
         ]
         mdrun_rerun.extend(settings.mdrun_flags)
-        _run_subprocess(mdrun_rerun, cwd=work_dir, timeout=timeout)
+        _run_subprocess(
+            mdrun_rerun,
+            cwd=work_dir,
+            timeout=timeout,
+            status_stream=status_stream,
+            status_label="GROMACS mdrun rerun",
+        )
         final_tpr = rerun_tpr
         energy_edr = work_dir / "rerun.edr"
         command_lines["grompp_rerun"] = grompp_rerun
@@ -4190,29 +4486,65 @@ def _run_subprocess(
     cwd: Path,
     input_text: Optional[str] = None,
     timeout: Optional[float] = None,
+    status_stream: Optional[Any] = None,
+    status_label: Optional[str] = None,
+    heartbeat_seconds: float = 30.0,
 ) -> subprocess.CompletedProcess[str]:
-    kwargs: dict[str, Any] = {
-        "cwd": str(cwd),
-        "check": False,
-        "capture_output": True,
-        "text": True,
-    }
-    if input_text is not None:
-        kwargs["input"] = input_text
-    if timeout is not None:
-        kwargs["timeout"] = timeout
     try:
-        result = subprocess.run(list(command), **kwargs)
-    except subprocess.TimeoutExpired as exc:
-        raise RuntimeError(
-            f"Command timed out after {timeout} seconds: {' '.join(command)}. "
-            + _timeout_tail(exc)
-        ) from exc
+        proc = subprocess.Popen(
+            list(command),
+            cwd=str(cwd),
+            stdin=subprocess.PIPE if input_text is not None else None,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError(f"Command not found: {' '.join(command)}") from exc
+
+    started_at = time.monotonic()
+    deadline = (started_at + float(timeout)) if timeout is not None else None
+    stdin_payload = input_text
+    first_call = True
+    label = status_label or "subprocess"
+    _status_print(status_stream, f"{label} started: {' '.join(command)}")
+    while True:
+        if deadline is not None:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0.0:
+                proc.kill()
+                stdout, stderr = proc.communicate()
+                exc = subprocess.TimeoutExpired(list(command), timeout)
+                exc.stdout = stdout
+                exc.stderr = stderr
+                raise RuntimeError(
+                    f"Command timed out after {timeout} seconds: {' '.join(command)}. "
+                    + _timeout_tail(exc)
+                ) from exc
+            wait_for = min(float(heartbeat_seconds), remaining) if status_stream is not None else remaining
+        else:
+            wait_for = float(heartbeat_seconds) if status_stream is not None else None
+        try:
+            if first_call:
+                stdout, stderr = proc.communicate(input=stdin_payload, timeout=wait_for)
+                first_call = False
+                stdin_payload = None
+            else:
+                stdout, stderr = proc.communicate(timeout=wait_for)
+            result = subprocess.CompletedProcess(list(command), proc.returncode or 0, stdout, stderr)
+            break
+        except subprocess.TimeoutExpired:
+            if status_stream is not None:
+                elapsed = time.monotonic() - started_at
+                _status_print(status_stream, f"{label} heartbeat: {elapsed:.1f}s elapsed")
+            stdin_payload = None
+            continue
     if result.returncode != 0:
         raise RuntimeError(
             f"Command failed with exit code {result.returncode}: {' '.join(command)}. "
             + _subprocess_tail(result)
         )
+    _status_print(status_stream, f"{label} completed in {time.monotonic() - started_at:.1f}s")
     return result
 
 
@@ -4250,6 +4582,15 @@ def _subprocess_tail(result: subprocess.CompletedProcess[str]) -> str:
     text = "\n".join(part for part in [result.stdout, result.stderr] if part)
     lines = text.splitlines()
     return "\n".join(lines[-20:]) if lines else ""
+
+
+def _status_print(status_stream: Optional[Any], message: str) -> None:
+    if status_stream is None:
+        return
+    if hasattr(status_stream, "status"):
+        status_stream.status(message)
+        return
+    print(message, file=status_stream, flush=True)
 
 
 def _normalize_prepare_mode(value: str) -> str:
