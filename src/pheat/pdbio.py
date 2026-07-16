@@ -174,6 +174,51 @@ def write_pdb(
         handle.write(text)
 
 
+def write_multimodel_pdb(
+    structures: Iterable[HeavyAtomStructure],
+    path: Union[str, Path],
+    *,
+    remarks_per_model: Optional[Iterable[Optional[Iterable[str]]]] = None,
+    allow_chain_truncation: bool = False,
+    domain: Optional[str] = None,
+) -> None:
+    """Write structures as a multi-model PDB with optional per-model remarks.
+
+    Each input structure becomes one ``MODEL``/``ENDMDL`` block. Per-model
+    remarks, when provided, are written inside that model block before atom
+    records. Existing single-structure ``END`` records are omitted so viewers
+    can treat the file as a trajectory-like ensemble.
+    """
+
+    structure_list = list(structures)
+    if remarks_per_model is None:
+        remarks_list: List[Optional[Iterable[str]]] = [None] * len(structure_list)
+    else:
+        remarks_list = list(remarks_per_model)
+        if len(remarks_list) != len(structure_list):
+            raise ValueError("remarks_per_model length must match structures length.")
+
+    lines: List[str] = []
+    for model_index, (structure, remarks) in enumerate(zip(structure_list, remarks_list), start=1):
+        lines.append(f"MODEL     {model_index:>4}")
+        pdb_text = structure_to_pdb_string(
+            structure,
+            allow_chain_truncation=allow_chain_truncation,
+            remarks=remarks,
+            domain=domain,
+        )
+        for line in pdb_text.splitlines():
+            record = line[:6].strip().upper()
+            if record in {"MODEL", "ENDMDL", "END"}:
+                continue
+            lines.append(line)
+        lines.append("ENDMDL")
+    lines.append("END")
+
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write("\n".join(lines) + "\n")
+
+
 def load_heavy_json(path: Union[str, Path]) -> HeavyAtomStructure:
     with open(path, "r", encoding="utf-8") as handle:
         return HeavyAtomStructure.from_dict(json.load(handle))

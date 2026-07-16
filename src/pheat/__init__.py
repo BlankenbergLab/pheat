@@ -42,6 +42,7 @@ from pheat.pdbio import (
     structure_from_pdb_string,
     structure_to_pdb_string,
     write_pdb,
+    write_multimodel_pdb,
     write_structure_json,
 )
 from pheat.roundtrip import (
@@ -143,6 +144,7 @@ __all__ = [
     "validate_scoring_options",
     "write_mmcif",
     "write_pdb",
+    "write_multimodel_pdb",
     "write_structure_json",
     "__version__",
 ]

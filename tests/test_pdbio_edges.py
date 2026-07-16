@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from pheat.pdbio import structure_from_pdb_string, structure_to_pdb_string, write_pdb
+from pheat.pdbio import structure_from_pdb_string, structure_to_pdb_string, write_multimodel_pdb, write_pdb
 
 
 class PdbIoEdgeTests(unittest.TestCase):
@@ -169,3 +169,57 @@ class PdbIoEdgeTests(unittest.TestCase):
         # REMARK records are dropped silently by the parser; ATOM records survive.
         self.assertEqual(len(reloaded.atoms), 1)
         self.assertEqual(reloaded.atoms[0].name, "CA")
+
+    def test_write_multimodel_pdb_writes_per_model_remarks(self):
+        first = structure_from_pdb_string(
+            "ATOM      1  CA  GLY A   1       1.000   0.000   0.000  1.00 10.00           C\nEND\n"
+        )
+        second = structure_from_pdb_string(
+            "ATOM      1  CA  GLY A   1       2.000   0.000   0.000  1.00 10.00           C\nEND\n"
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "trajectory.pdb"
+            write_multimodel_pdb(
+                [first, second],
+                output_path,
+                remarks_per_model=[
+                    ["QTF_SCORE energy=-1 gromacs_potential_kj_mol=-2"],
+                    ["QTF_SCORE energy=-3 gromacs_potential_kj_mol=-4"],
+                ],
+            )
+            output = output_path.read_text(encoding="utf-8")
+
+        self.assertEqual(output.count("MODEL"), 2)
+        self.assertEqual(output.count("ENDMDL"), 2)
+        self.assertTrue(output.rstrip().endswith("END"))
+        self.assertIn("REMARK   1 QTF_SCORE energy=-1 gromacs_potential_kj_mol=-2", output)
+        self.assertIn("REMARK   1 QTF_SCORE energy=-3 gromacs_potential_kj_mol=-4", output)
+        model_two = structure_from_pdb_string(output, model=2)
+        self.assertEqual(len(model_two.atoms), 1)
+        self.assertEqual(model_two.atoms[0].x, 2.0)
+
+    def test_write_multimodel_pdb_validates_remark_count(self):
+        structure = structure_from_pdb_string(
+            "ATOM      1  CA  GLY A   1       1.000   0.000   0.000  1.00 10.00           C\nEND\n"
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "bad.pdb"
+            with self.assertRaisesRegex(ValueError, "remarks_per_model length"):
+                write_multimodel_pdb([structure], output_path, remarks_per_model=[])
+
+    def test_write_multimodel_pdb_forwards_domain_filter(self):
+        structure = structure_from_pdb_string(
+            "ATOM      1  CA  GLY A   1       1.000   0.000   0.000  1.00 10.00           C\n"
+            "HETATM    2  O   HOH A 101       2.000   0.000   0.000  1.00 10.00           O\n"
+            "END\n"
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "filtered_models.pdb"
+            write_multimodel_pdb([structure], output_path, domain="protein-heavy")
+            output = output_path.read_text(encoding="utf-8")
+
+        self.assertIn(" GLY ", output)
+        self.assertNotIn(" HOH ", output)
