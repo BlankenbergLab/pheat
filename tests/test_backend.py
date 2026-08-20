@@ -736,6 +736,22 @@ class BackendTests(unittest.TestCase):
                         delta=0.08,
                     )
 
+                aromatic_ring_names = {
+                    "PHE": {"CG", "CD1", "CD2", "CE1", "CE2", "CZ"},
+                    "TYR": {"CG", "CD1", "CD2", "CE1", "CE2", "CZ"},
+                    "HIS": {"CG", "ND1", "CD2", "CE1", "NE2"},
+                    "TRP": {"CG", "CD1", "CD2", "NE1", "CE2", "CE3", "CZ2", "CZ3", "CH2"},
+                }.get(resname)
+                if aromatic_ring_names is None:
+                    continue
+                ring_atoms = [atoms[name] for name in sorted(aromatic_ring_names)]
+                minimum_separation = min(
+                    distance(atom_a.coord, atom_b.coord)
+                    for index, atom_a in enumerate(ring_atoms)
+                    for atom_b in ring_atoms[index + 1 :]
+                )
+                self.assertGreater(minimum_separation, 1.25)
+
     def test_modified_ring_reconstruction_closes_ring_bonds(self):
         closure_checks = {
             "HYP": [(("N", "CD"), 1.47), (("CD", "CG"), 1.50)],

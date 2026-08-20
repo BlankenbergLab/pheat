@@ -2402,9 +2402,9 @@ def _cmd_scoring_validate_options(args: argparse.Namespace) -> int:
         decoded_torsions = _load_json_mapping(args.decoded_torsions, label="--decoded-torsions")
         if decoded_torsions is not None:
             options["decoded_torsions"] = decoded_torsions
-        if normalized_model == "pheat-coarse-protein-folding-v1" or args.disable_end_to_end_constraint:
+        if normalized_model == "pheat-custom-energy-v1" or args.disable_end_to_end_constraint:
             options["use_end_to_end_constraint"] = not args.disable_end_to_end_constraint
-        if normalized_model == "pheat-coarse-protein-folding-v1" or args.end_to_end_scale != 1.0:
+        if normalized_model == "pheat-custom-energy-v1" or args.end_to_end_scale != 1.0:
             options["end_to_end_scale"] = args.end_to_end_scale
         payload = validate_scoring_options(args.model, options)
     if payload.get("ok"):

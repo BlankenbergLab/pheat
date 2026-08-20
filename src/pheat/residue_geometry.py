@@ -59,6 +59,29 @@ DEFAULT_PHI_DEGREES = -60.0
 DEFAULT_PSI_DEGREES = -45.0
 DEFAULT_OMEGA_DEGREES = 180.0
 
+# Idealized planar aromatic templates in a local frame rooted at CG.  The x axis
+# follows the first ring branch (CD1/ND1), and the y axis points toward the
+# second branch.  Rebuilding fused and closed rings as an unconstrained chain of
+# internal-coordinate steps accumulates closure error; these templates preserve
+# chi1/chi2 orientation while enforcing chemically meaningful ring geometry.
+_AROMATIC_LOCAL_TEMPLATES: Dict[str, Dict[str, Tuple[float, float]]] = {
+    "PHE": {
+        "CD1": (1.386965, 0.0), "CD2": (-0.663592, 1.217500),
+        "CE1": (2.093342, 1.188041), "CE2": (0.039651, 2.406356),
+        "CZ": (1.420057, 2.391026),
+    },
+    "HIS": {
+        "ND1": (1.379165, 0.0), "CD2": (-0.376797, 1.300149),
+        "CE1": (1.815757, 1.247747), "NE2": (0.770590, 2.054608),
+    },
+    "TRP": {
+        "CD1": (1.362720, 0.0), "CD2": (-0.401066, 1.391571),
+        "NE1": (1.835814, 1.288852), "CE2": (0.770321, 2.153414),
+        "CE3": (-1.641525, 2.041433), "CZ2": (0.744158, 3.539116),
+        "CZ3": (-1.667758, 3.431033), "CH2": (-0.505181, 4.159794),
+    },
+}
+
 
 def load_residue_geometry(path: Union[str, Path], *, angle_units: Optional[str] = None) -> ResidueGeometryStructure:
     if angle_units is not None:
@@ -628,6 +651,8 @@ def structure_from_residue_geometry(
             _close_pca_ring(local_atoms, residue)
         if resname == "PYL":
             _close_pyl_ring(local_atoms, residue)
+        if resname in {"PHE", "TYR", "PTR", "HIS", "TRP"}:
+            _close_aromatic_ring(local_atoms, resname)
 
         previous_backbone = {"N": n_atom, "CA": ca_atom, "C": c_atom}
         previous_geometry = residue
@@ -1010,6 +1035,44 @@ def _atom(
 
 def _residue_length(residue: ResidueGeometry, key: str, fallback: float) -> float:
     return float(residue.bond_lengths.get(key, fallback))
+
+
+def _close_aromatic_ring(local_atoms: Dict[str, Atom], resname: str) -> None:
+    """Project a reconstructed aromatic ring onto a rigid planar template."""
+
+    template_name = "PHE" if resname in {"PHE", "TYR", "PTR"} else resname
+    template = _AROMATIC_LOCAL_TEMPLATES[template_name]
+    first_name = "ND1" if template_name == "HIS" else "CD1"
+    second_name = "CD2"
+    required = {"CG", first_name, second_name, *template}
+    if not required.issubset(local_atoms):
+        return
+
+    origin = local_atoms["CG"].coord
+    x_axis = normalize(sub(local_atoms[first_name].coord, origin))
+    second_vector = sub(local_atoms[second_name].coord, origin)
+    normal = normalize(cross(x_axis, second_vector))
+    y_axis = normalize(cross(normal, x_axis))
+
+    old_oh = local_atoms["OH"].coord if "OH" in local_atoms else None
+    for atom_name, (x_value, y_value) in template.items():
+        local_atoms[atom_name].coord = add(
+            origin,
+            add(scale(x_axis, x_value), scale(y_axis, y_value)),
+        )
+
+    if resname in {"TYR", "PTR"} and "OH" in local_atoms:
+        cz = local_atoms["CZ"].coord
+        ring_center = scale(
+            add(add(local_atoms["CG"].coord, local_atoms["CE1"].coord), local_atoms["CE2"].coord),
+            1.0 / 3.0,
+        )
+        local_atoms["OH"].coord = add(cz, scale(normalize(sub(cz, ring_center)), 1.36))
+        if resname == "PTR" and old_oh is not None:
+            displacement = sub(local_atoms["OH"].coord, old_oh)
+            for atom_name in ("P", "O1P", "O2P", "O3P"):
+                if atom_name in local_atoms:
+                    local_atoms[atom_name].coord = add(local_atoms[atom_name].coord, displacement)
 
 
 def _close_proline_ring(local_atoms: Dict[str, Atom], residue: ResidueGeometry) -> None:

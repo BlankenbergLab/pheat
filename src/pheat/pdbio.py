@@ -383,6 +383,8 @@ def structure_to_pdb_string(
             serial_by_atom_id[id(atom)] = serial
             previous_chain = atom.chain_id
             serial += 1
+        if previous_chain is not None:
+            lines.append("TER")
         if multi_model:
             lines.append("ENDMDL")
     for serial_a, serial_b in _disulfide_conect_serial_pairs(

@@ -199,16 +199,6 @@ REFERENCE_DECOY_DATASETS = (
         "packageable": False,
         "notes": ["Register local files explicitly unless a stable public payload URL is supplied."],
     },
-    {
-        "id": "rosetta",
-        "name": "Rosetta decoy resources",
-        "urls": ["https://www.rosettacommons.org/"],
-        "expected_payloads": [],
-        "license_status": "dataset-specific",
-        "local_use_only": True,
-        "packageable": False,
-        "notes": ["Register local files explicitly unless a stable public payload URL is supplied."],
-    },
 )
 
 
