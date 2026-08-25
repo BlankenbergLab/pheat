@@ -4702,11 +4702,12 @@ def _run_subprocess(
             stderr=subprocess.PIPE,
             text=True,
         )
-    except FileNotFoundError as exc:
-        raise RuntimeError(f"Command not found: {' '.join(command)}") from exc
+    except FileNotFoundError as file_not_found_exc:
+        raise RuntimeError(f"Command not found: {' '.join(command)}") from file_not_found_exc
 
     started_at = time.monotonic()
-    deadline = (started_at + float(timeout)) if timeout is not None else None
+    timeout_seconds = float(timeout) if timeout is not None else None
+    deadline = (started_at + timeout_seconds) if timeout_seconds is not None else None
     stdin_payload = input_text
     first_call = True
     label = status_label or "subprocess"
@@ -4717,14 +4718,17 @@ def _run_subprocess(
             if remaining <= 0.0:
                 proc.kill()
                 stdout, stderr = proc.communicate()
-                exc = subprocess.TimeoutExpired(list(command), timeout)
-                exc.stdout = stdout
-                exc.stderr = stderr
+                assert timeout_seconds is not None
+                timeout_exc = subprocess.TimeoutExpired(list(command), timeout_seconds)
+                timeout_exc.stdout = stdout.encode("utf-8", errors="replace")
+                timeout_exc.stderr = stderr.encode("utf-8", errors="replace")
                 raise RuntimeError(
-                    f"Command timed out after {timeout} seconds: {' '.join(command)}. "
-                    + _timeout_tail(exc)
-                ) from exc
-            wait_for = min(float(heartbeat_seconds), remaining) if status_stream is not None else remaining
+                    f"Command timed out after {timeout_seconds} seconds: {' '.join(command)}. "
+                    + _timeout_tail(timeout_exc)
+                ) from timeout_exc
+            wait_for: Optional[float] = (
+                min(float(heartbeat_seconds), remaining) if status_stream is not None else remaining
+            )
         else:
             wait_for = float(heartbeat_seconds) if status_stream is not None else None
         try:
