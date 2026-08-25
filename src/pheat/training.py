@@ -8,14 +8,14 @@ committed.
 
 from __future__ import annotations
 
-from concurrent.futures import ProcessPoolExecutor
-from dataclasses import dataclass
-from datetime import datetime, timezone
 import gzip
 import hashlib
 import json
 import math
 import os
+from concurrent.futures import ProcessPoolExecutor
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from time import monotonic
 from typing import Any, Callable, Iterable, Mapping, Optional, Sequence, Union
@@ -31,9 +31,12 @@ from pheat.residue_geometry import structure_to_residue_geometry
 from pheat.residues import CANONICAL_RESIDUES, three_to_one
 from pheat.sasa import SASA_BACKENDS, residue_burial
 from pheat.score_contracts import score_input_contract
-from pheat.score_tables import SCORE_TABLE_SET_FORMAT, SCORE_TABLE_SET_VERSION, write_score_table_set
+from pheat.score_tables import (
+    SCORE_TABLE_SET_FORMAT,
+    SCORE_TABLE_SET_VERSION,
+    write_score_table_set,
+)
 from pheat.scoring import KYTE_DOOLITTLE_HYDROPATHY
-
 
 Point3D = tuple[float, float, float]
 

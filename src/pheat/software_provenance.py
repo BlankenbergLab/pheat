@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-from importlib import metadata as importlib_metadata
 import platform
 import shutil
 import subprocess
 import sys
+from importlib import metadata as importlib_metadata
 from typing import Any, Mapping, Optional, Sequence
 
 from pheat.scoring import model_capabilities
-
 
 BASE_PACKAGE_COMPONENTS = (
     {"name": "platformdirs", "role": "PHEAT cache and platform path handling", "required": True},

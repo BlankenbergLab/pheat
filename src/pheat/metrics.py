@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from pheat.geometry import apply_kabsch_transform, kabsch_rmsd, kabsch_transform, radius_of_gyration
 from pheat.models import Atom, HeavyAtomStructure
 
-
 RADIUS_OF_GYRATION_RESULT_FORMAT = "pheat.radius-of-gyration-result"
 RADIUS_OF_GYRATION_RESULT_VERSION = 1
 RADIUS_OF_GYRATION_UNITS = "angstrom"
@@ -337,7 +336,8 @@ def pairwise_rmsd_matrix(
     NumPy because the underlying Kabsch SVD step relies on it.
     """
 
-    from pheat.geometry import _require_numpy_for_kabsch, kabsch_rmsd as _kabsch_rmsd
+    from pheat.geometry import _require_numpy_for_kabsch
+    from pheat.geometry import kabsch_rmsd as _kabsch_rmsd
 
     np = _require_numpy_for_kabsch()
     items: list[Any] = list(structures)

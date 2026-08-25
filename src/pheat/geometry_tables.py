@@ -2,23 +2,22 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
 import gzip
 import hashlib
-from importlib import resources
-from importlib.metadata import PackageNotFoundError, version
 import json
 import math
-from pathlib import Path
 import shlex
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from importlib import resources
+from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional, Sequence, Union
 
 from pheat.domains import filter_structure_for_domain, normalize_domain
 from pheat.geometry import angle_degrees, distance
 from pheat.models import Atom, HeavyAtomStructure, ResidueKey
 from pheat.residues import CANONICAL_RESIDUES, SIDECHAIN_STEPS, SUPPORTED_RESIDUES, SidechainStep
-
 
 GEOMETRY_TABLE_SET_FORMAT = "pheat.geometry-table-set"
 GEOMETRY_TABLE_SET_VERSION = 1
@@ -354,8 +353,13 @@ def build_backbone_geometry_tables(
     table_set_version: str = "v1",
     command_args: Optional[Sequence[str]] = None,
 ) -> dict[str, Any]:
-    from pheat.training import _entries_sha256, _source_corpus_summary, _training_set_entries
-    from pheat.training import _training_set_manifest, load_training_structure
+    from pheat.training import (
+        _entries_sha256,
+        _source_corpus_summary,
+        _training_set_entries,
+        _training_set_manifest,
+        load_training_structure,
+    )
 
     entries = _training_set_entries(training_set)
     if max_entries is not None:
@@ -462,8 +466,13 @@ def build_cdl_geometry_tables(
     not vendor or reproduce Phenix/CCTBX CDL parameter tables.
     """
 
-    from pheat.training import _entries_sha256, _source_corpus_summary, _training_set_entries
-    from pheat.training import _training_set_manifest, load_training_structure
+    from pheat.training import (
+        _entries_sha256,
+        _source_corpus_summary,
+        _training_set_entries,
+        _training_set_manifest,
+        load_training_structure,
+    )
 
     if phi_psi_bin_size <= 0 or 360 % phi_psi_bin_size:
         raise ValueError("--phi-psi-bin-size must be a positive divisor of 360")

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
 import json
 import sys
 import traceback
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional, Sequence
 
@@ -22,8 +22,8 @@ from pheat.archive import (
     relocate_snapshot_manifest_from_args,
     run_download_from_args,
     run_snapshot_download_from_args,
-    snapshot_metadata_from_args,
     snapshot_ids,
+    snapshot_metadata_from_args,
     snapshot_to_dict,
     verify_snapshot_from_args,
 )
@@ -56,7 +56,6 @@ from pheat.geometry_tables import (
     validate_geometry_tables,
 )
 from pheat.hydrogens import HYDROGEN_POLICIES, generate_hydrogens
-from pheat.models import HeavyAtomStructure
 from pheat.metrics import (
     RMSD_ATOM_SETS,
     SAME_AS_RMSD_ALIGNMENT,
@@ -64,6 +63,7 @@ from pheat.metrics import (
     structure_rmsd_result,
 )
 from pheat.mmcif import load_mmcif, write_mmcif
+from pheat.models import HeavyAtomStructure
 from pheat.molstar_assets import (
     DEFAULT_MOLSTAR_VERSION,
     MOLSTAR_ENV_VAR,
@@ -104,26 +104,32 @@ from pheat.reference import (
     train_reference_ml,
     validate_reference_features,
 )
+from pheat.residue_geometry import (
+    ANGLE_UNITS,
+    structure_from_residue_geometry,
+    structure_to_residue_geometry,
+    write_residue_geometry_json,
+)
+from pheat.sasa import BURIAL_METHODS, SASA_BACKENDS
 from pheat.scoring import (
     AMBER_SOLVENT_MODES,
     DEFAULT_AMBER_FORCEFIELD,
     DEFAULT_GROMACS_FORCEFIELD,
     DEFAULT_GROMACS_WATER,
-    GromacsRunSettings,
     GROMACS_PREFLIGHT_MODES,
     GROMACS_RUN_MODES,
     GROMACS_WATER_MODELS,
     PREP_CACHE_MODES,
     PREPARE_MODES,
+    GromacsRunSettings,
     prepare_gromacs_structure,
     score_structure,
     score_structure_profiles,
     supported_models,
-    validate_scoring_options,
     validate_external_scoring_options,
+    validate_scoring_options,
 )
 from pheat.sources import fetch_source, list_sources, verify_sources
-from pheat.sasa import BURIAL_METHODS, SASA_BACKENDS
 from pheat.training import (
     DEFAULT_TRAINING_DOMAIN,
     DEFAULT_TRAINING_MODELS,
@@ -146,12 +152,6 @@ from pheat.training import (
     validate_tables,
     verify_decoy_root,
     write_snapshot_ids,
-)
-from pheat.residue_geometry import (
-    ANGLE_UNITS,
-    structure_from_residue_geometry,
-    structure_to_residue_geometry,
-    write_residue_geometry_json,
 )
 from pheat.webapp import (
     DEFAULT_WEB_HOST,

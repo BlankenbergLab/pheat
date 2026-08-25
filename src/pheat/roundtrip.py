@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import itertools
+import re
 from collections.abc import Iterable
 from dataclasses import dataclass, replace
-import itertools
 from pathlib import Path
-import re
 from typing import Any, Mapping, Optional, Sequence, Union
 
 from pheat.metrics import (
@@ -17,16 +17,15 @@ from pheat.metrics import (
     structure_radius_of_gyration,
     structure_rmsd,
 )
-from pheat.models import Atom, HeavyAtomStructure
 from pheat.mmcif import structure_to_mmcif_string
+from pheat.models import Atom, HeavyAtomStructure
 from pheat.pdbio import structure_to_pdb_string
-from pheat.scoring import score_structure, supported_models
 from pheat.residue_geometry import (
     ANGLE_UNITS,
     structure_from_residue_geometry,
     structure_to_residue_geometry,
 )
-
+from pheat.scoring import score_structure, supported_models
 
 ANGLE_NAMES = ("omega", "tau", "theta")
 CHI_LIMITS = (None, 1, 2)

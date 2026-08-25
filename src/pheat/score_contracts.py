@@ -5,7 +5,6 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
-
 SCORE_CONTRACT_VERSION = 1
 
 _COMMON_ATOM_STRUCTURE = {

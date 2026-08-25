@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import csv
-from datetime import datetime, timezone
 import hashlib
 import json
-from pathlib import Path
 import sys
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
 
 from pheat import __version__
@@ -19,7 +19,6 @@ from pheat.models import HeavyAtomStructure
 from pheat.pdbio import load_pdb, write_structure_json
 from pheat.residues import SUPPORTED_RESIDUES
 from pheat.schemas import validate_json_object
-
 
 SUPPORTED_CORPUS_SPEC_TEMPLATES = (
     "user-defined-ids",

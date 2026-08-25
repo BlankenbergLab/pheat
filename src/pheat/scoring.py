@@ -2,22 +2,22 @@
 
 from __future__ import annotations
 
-from contextlib import contextmanager
-from copy import deepcopy
-from dataclasses import dataclass, field
 import hashlib
 import importlib
 import itertools
 import json
 import math
 import os
-from pathlib import Path
 import random
 import re
 import shutil
 import subprocess
 import tempfile
 import time
+from contextlib import contextmanager
+from copy import deepcopy
+from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 from pheat.domains import filter_structure_for_domain, merge_coverage_metadata
@@ -29,7 +29,6 @@ from pheat.residues import CANONICAL_RESIDUES, SIDECHAIN_STEPS, SUPPORTED_RESIDU
 from pheat.sasa import SASA_BACKENDS, residue_burial
 from pheat.score_contracts import normalize_score_model_id, score_input_contract
 from pheat.score_tables import default_profile, load_score_table_set, profile_ids, table_for_model
-
 
 # Common van der Waals radii used for broad contact detection. These are
 # Bondi-style approximate radii (source manifest: bondi-1964-vdw-radii) plus a
@@ -3659,8 +3658,7 @@ def _score_openmm_prepared(structure: HeavyAtomStructure) -> EnergyResult:
 
     prepared_structure, terminal_oxt_added = _with_forcefield_terminal_oxt(structure)
     try:
-        from openmm import Platform, VerletIntegrator, unit
-        from openmm import app
+        from openmm import Platform, VerletIntegrator, app, unit
     except Exception as exc:  # pragma: no cover - depends on optional environment
         raise RuntimeError(
             "openmm-prepared scoring requires the optional Miniforge environment with OpenMM/PDBFixer."
@@ -3815,8 +3813,7 @@ def _prepare_pdb_for_forcefield(
 
     prepared_structure, terminal_oxt_added = _with_forcefield_terminal_oxt(structure)
     try:
-        from openmm import Platform
-        from openmm import app
+        from openmm import Platform, app
     except Exception as exc:  # pragma: no cover - depends on optional user environment
         raise RuntimeError(
             "--prepare auto/write for ambertools-sander requires OpenMM for deterministic "
@@ -4471,8 +4468,7 @@ def _write_pdb_for_gromacs_pdb2gmx(
     prepared_structure, terminal_oxt_added = _with_forcefield_terminal_oxt(structure)
 
     try:
-        from openmm import Platform
-        from openmm import app
+        from openmm import Platform, app
     except Exception as exc:  # pragma: no cover - depends on optional user environment
         output_pdb.write_text(
             structure_to_pdb_string(prepared_structure, allow_chain_truncation=True),

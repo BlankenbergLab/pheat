@@ -7,11 +7,10 @@ installed.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import json
 import math
+from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
-
 
 Coordinate = Tuple[float, float, float]
 ResidueKey = Tuple[str, int, str, str, str]

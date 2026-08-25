@@ -8,25 +8,24 @@ a future caller adds that behavior explicitly.
 
 from __future__ import annotations
 
-from concurrent.futures import ProcessPoolExecutor
-from dataclasses import dataclass
-from datetime import datetime, timezone
 import argparse
 import gzip
 import hashlib
 import json
 import math
-from pathlib import Path
 import shutil
 import sys
 import tempfile
+from concurrent.futures import ProcessPoolExecutor
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 from time import monotonic
 from typing import Any, Callable, Iterable, Mapping, Optional, Sequence
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from pheat.bcif import decode_bcif_column
-
 
 DEFAULT_OUTPUT_ROOT = Path(".pheat-cache/pdb-archive")
 SEARCH_QUERY_URL = "https://search.rcsb.org/rcsbsearch/v2/query"

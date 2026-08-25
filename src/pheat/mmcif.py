@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional, Sequence, Union
 
 from pheat.bonds import structure_with_bonds
 from pheat.hydrogens import generate_hydrogens, is_hydrogen_element, normalize_hydrogen_policy
 from pheat.models import Atom, DisulfideBond, HeavyAtomStructure, ResidueReference
 from pheat.residues import guess_element
-
 
 MMCIF_CHAIN_ID_SOURCES = ("auth", "label")
 

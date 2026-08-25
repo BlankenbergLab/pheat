@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import html
 import json
-from pathlib import Path
 import random
 import socket
 import uuid
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from pheat.mmcif import structure_from_mmcif_string
@@ -19,6 +19,12 @@ from pheat.molstar_assets import (
     resolve_molstar_assets,
 )
 from pheat.pdbio import structure_from_pdb_string
+from pheat.report_assets import (
+    molstar_alignment_viewer_script,
+    pheat_citation_html,
+    software_provenance_html,
+    sortable_table_css,
+)
 from pheat.roundtrip import (
     ANGLE_NAMES,
     SCORE_MODELS,
@@ -32,14 +38,7 @@ from pheat.roundtrip import (
     single_roundtrip_case_spec,
     write_roundtrip_artifacts,
 )
-from pheat.report_assets import (
-    molstar_alignment_viewer_script,
-    pheat_citation_html,
-    software_provenance_html,
-    sortable_table_css,
-)
 from pheat.software_provenance import collect_software_provenance
-
 
 DEFAULT_WEB_WORK_DIR = ".pheat-cache/web"
 DEFAULT_MOLSTAR_VENDOR_DIR = None

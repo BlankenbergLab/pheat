@@ -7,23 +7,32 @@ import math
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
-from pheat.geometry_tables import geometry_lookup
-from pheat.geometry import add
+from pheat.geometry import (
+    add,
+    cross,
+    dihedral_degrees,
+    distance,
+    dot,
+    norm,
+    normalize,
+    place_atom,
+    scale,
+    sub,
+)
 from pheat.geometry import angle_degrees as bond_angle_degrees
-from pheat.geometry import cross, dihedral_degrees, distance, dot, norm, normalize, place_atom, scale, sub
+from pheat.geometry_tables import geometry_lookup
 from pheat.models import (
     OPTIONAL_RESIDUE_GEOMETRY_ANGLES,
     RESIDUE_GEOMETRY_BACKBONE_LENGTHS,
     Atom,
     HeavyAtomStructure,
-    ResidueKey,
     ResidueGeometry,
     ResidueGeometryStructure,
+    ResidueKey,
     _normalize_stored_angles,
     _normalize_stored_lengths,
 )
 from pheat.residues import DEFAULT_CHIS, SIDECHAIN_STEPS, guess_element, one_to_three, three_to_one
-
 
 # Idealized backbone geometry used for deterministic reconstruction. These rounded
 # bond lengths and angles follow standard Engh-Huber-style protein geometry

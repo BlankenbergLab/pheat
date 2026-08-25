@@ -12,7 +12,6 @@ from typing import Any, Mapping, Tuple
 from pheat.models import Atom, DisulfideBond, HeavyAtomStructure
 from pheat.residues import SUPPORTED_RESIDUES
 
-
 SCORING_DOMAINS = ("protein-heavy", "all-heavy", "full")
 
 
