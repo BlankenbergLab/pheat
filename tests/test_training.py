@@ -1423,7 +1423,7 @@ class TrainingCommandTests(unittest.TestCase):
                 "hydrogens_added": 2,
             }
 
-        def fake_run(command, *, cwd, check, capture_output, text):
+        def fake_run(command, *, cwd, **kwargs):
             command_name = Path(command[0]).name
             work_dir = Path(cwd)
             if command_name == "tleap":
@@ -1443,7 +1443,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 result = score_structure(
                     structure,
@@ -1466,7 +1466,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 status, stdout, _stderr = _capture_cli(
                     [
@@ -1499,7 +1499,7 @@ class TrainingCommandTests(unittest.TestCase):
             )
             return [], {"mode": prepare, "engine": "test"}
 
-        def fake_run(command, *, cwd, check, capture_output, text):
+        def fake_run(command, *, cwd, **kwargs):
             command_name = Path(command[0]).name
             work_dir = Path(cwd)
             if command_name == "tleap":
@@ -1519,7 +1519,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 result = score_structure(
                     structure,
@@ -1543,7 +1543,7 @@ class TrainingCommandTests(unittest.TestCase):
             )
             return [], {"mode": prepare, "engine": "test"}
 
-        def fake_run(command, *, cwd, check, capture_output, text):
+        def fake_run(command, *, cwd, **kwargs):
             command_name = Path(command[0]).name
             work_dir = Path(cwd)
             if command_name == "tleap":
@@ -1556,7 +1556,7 @@ class TrainingCommandTests(unittest.TestCase):
                     "FATAL: bad atom geometry in generated structure\n",
                     encoding="utf-8",
                 )
-                return subprocess.CompletedProcess(command, 1, stdout="", stderr="")
+                raise RuntimeError(f"Command failed with exit code 1: {' '.join(command)}. ")
             return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
 
         structure = load_pdb(TINY_PDB)
@@ -1564,7 +1564,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 with self.assertRaisesRegex(RuntimeError, "Last lines from sander.out") as raised:
                     score_structure(
@@ -1603,7 +1603,7 @@ class TrainingCommandTests(unittest.TestCase):
                 "prepared_atom_count": len(structure.atoms),
             }
 
-        def fake_run(command, *, cwd, check, capture_output, text, input=None):
+        def fake_run(command, *, cwd, **kwargs):
             work_dir = Path(cwd)
             if command[1] == "--version":
                 return subprocess.CompletedProcess(
@@ -1648,7 +1648,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._write_pdb_for_gromacs_pdb2gmx", side_effect=fake_prepare_input),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 result = score_structure(
                     structure,
@@ -1676,7 +1676,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._write_pdb_for_gromacs_pdb2gmx", side_effect=fake_prepare_input),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 status, stdout, _stderr = _capture_cli(
                     [
@@ -1698,7 +1698,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._write_pdb_for_gromacs_pdb2gmx", side_effect=fake_prepare_input),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 status, stdout, _stderr = _capture_cli(
                     [
@@ -1775,14 +1775,15 @@ class TrainingCommandTests(unittest.TestCase):
                 (work_dir / "system.prmtop").write_text("prmtop\n", encoding="utf-8")
                 (work_dir / "system.inpcrd").write_text("inpcrd\n", encoding="utf-8")
                 return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
-            raise subprocess.TimeoutExpired(command, kwargs.get("timeout"), output="running", stderr="slow")
+            timeout = kwargs.get("timeout")
+            raise RuntimeError(f"Command timed out after {timeout} seconds: {' '.join(command)}. ")
 
         structure = load_pdb(TINY_PDB)
         with tempfile.TemporaryDirectory() as tmpdir:
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 with self.assertRaisesRegex(RuntimeError, "timed out after 1.5 seconds"):
                     score_structure(
@@ -1845,7 +1846,7 @@ class TrainingCommandTests(unittest.TestCase):
             second_work = Path(tmpdir) / "second"
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 first = score_structure(
                     structure,

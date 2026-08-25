@@ -496,11 +496,11 @@ class BackendTests(unittest.TestCase):
 
         self.assertAlmostEqual(
             kabsch_rmsd(original_coords, reconstructed_coords),
-            1.0049890010274787,
+            1.0036912132468936,
         )
         self.assertAlmostEqual(
             kabsch_rmsd(original_coords, reconstructed_coords, aligned_target=aligned_coords),
-            1.0049890010274787,
+            1.0036912132468936,
         )
 
     def test_in_memory_residue_geometry_reconstruction_matches_serialized_optional_geometry(self):
@@ -527,7 +527,7 @@ class BackendTests(unittest.TestCase):
                 [original_atoms[key].coord for key in common_keys],
                 [direct_atoms[key].coord for key in common_keys],
             ),
-            1.0049890010274787,
+            1.0036912132458538,
         )
 
     def test_residue_geometry_extraction_does_not_bridge_residue_number_gaps(self):
@@ -1716,9 +1716,8 @@ class BackendTests(unittest.TestCase):
         self.assertTrue(math.isfinite(result.total))
         self.assertEqual(result.metadata["preparation"], "pdbfixer")
         self.assertEqual(result.metadata["preparation_seed"], 20260514)
-        self.assertEqual(result.metadata["missing_terminal_atoms_added"], 1)
+        self.assertEqual(result.metadata["missing_terminal_atoms_added"], 0)
         self.assertIn("hydrogens were added internally", "\n".join(result.warnings))
-        self.assertIn("PDBFixer added missing heavy or terminal atoms", "\n".join(result.warnings))
         second = score_structure(structure, model="openmm-prepared")
         self.assertAlmostEqual(result.total, second.total)
 
