@@ -336,7 +336,7 @@ class NerfFolder:
         self.OMEGA_MIN = np.deg2rad(170.0)
         self.OMEGA_MAX = np.deg2rad(190.0)
         self.OMEGA_HALF_WIDTH = 0.5 * (self.OMEGA_MAX - self.OMEGA_MIN)
-        self.fixed_omegas = np.full(max(0, self.n_residues - 1), np.pi, dtype=float)
+        self.fixed_omegas: np.ndarray = np.full(max(0, self.n_residues - 1), np.pi, dtype=float)
 
         self.SIDE_CHAIN_TOPO = {
             'G': [],
@@ -1150,9 +1150,9 @@ class NerfFolder:
         around rings with NERF, which can accumulate closure errors and produce
         distorted aromatic bonds/clashes.
         """
-        coords = []
-        labels = []
-        bonds = []
+        coords: list[np.ndarray] = []
+        labels: list[tuple[int, str, str]] = []
+        bonds: list[tuple[int, int]] = []
 
         angle_dict = self._angle_dict_from_vector(angle_vector)
 
@@ -1342,7 +1342,7 @@ class NerfFolder:
 
             aa = self.sequence[i]
             topo = self.SIDE_CHAIN_TOPO.get(aa, self.SIDE_CHAIN_TOPO['DEFAULT'])
-            parent_map = {str(atom_def[0]): str(atom_def[1]) for atom_def in topo}
+            parent_map: dict[str, str | None] = {str(atom_def[0]): str(atom_def[1]) for atom_def in topo}
             parent_map.update({'N': None, 'CA': 'N', 'C': 'CA', 'O': 'C'})
 
             def get_idx(name):
@@ -1541,13 +1541,13 @@ class NerfFolder:
         # true 1-2 / 1-3 pairs and soften 1-4 pairs. This is more physical than
         # residue-index masking and should stop the LJ wall from over-penalizing
         # locally connected native geometry.
-        adjacency = [set() for _ in range(n_atoms)]
+        adjacency: list[set[int]] = [set() for _ in range(n_atoms)]
         for i, j in static_bonds:
             if 0 <= i < n_atoms and 0 <= j < n_atoms:
                 adjacency[i].add(j)
                 adjacency[j].add(i)
 
-        graph_dist = np.full((n_atoms, n_atoms), 99, dtype=int)
+        graph_dist: np.ndarray = np.full((n_atoms, n_atoms), 99, dtype=int)
         np.fill_diagonal(graph_dist, 0)
         for i in range(n_atoms):
             frontier = {i}
@@ -1579,7 +1579,7 @@ class NerfFolder:
         # NOTE: self.sequence is 1-letter codes
         hydro_res_set = set(list("AVLIMFWYPC"))  # include Tyr (Y) + Trp (W)
 
-        self.mask_hydrophobic = np.zeros(n_atoms, dtype=bool)
+        self.mask_hydrophobic: np.ndarray = np.zeros(n_atoms, dtype=bool)
         for k, (rid, name, elem) in enumerate(self.static_labels):
             aa = self.sequence[rid]
 
@@ -2165,7 +2165,7 @@ class NerfFolder:
             "planarity": 0.0,
         }
 
-        res_map = {}
+        res_map: dict[int, dict[str, int]] = {}
         for k, lbl in enumerate(labels):
             r = lbl[0]
             atom = lbl[1]
@@ -2243,7 +2243,7 @@ class NerfFolder:
         coords = np.asarray(coords, dtype=float)
         labels = list(labels)
 
-        res_map = {}
+        res_map: dict[int, dict[str, int]] = {}
         for k, lbl in enumerate(labels):
             r = int(lbl[0])
             atom = str(lbl[1])
@@ -2385,7 +2385,7 @@ class NerfFolder:
                     _counter += 1
             return value
 
-        _tracker._heap = _heap
+        setattr(_tracker, "_heap", _heap)
         return _tracker
 
     def fold(
@@ -2559,9 +2559,7 @@ class NerfFolder:
         coords, labels, bonds = self._final_output_structure_from_params(final_res.x)
         final_energy = self.last_energy_terms.get(
             "total",
-            self.last_energy_terms.get(
-                self.last_energy_terms.get("openmm_potential_kj_mol", float(final_res.fun)),
-            ),
+            self.last_energy_terms.get("openmm_potential_kj_mol", float(final_res.fun)),
         )
         return coords, labels, bonds, self.tracker, final_res.x, float(final_energy), best_snapshots
 
@@ -2571,7 +2569,7 @@ class NerfFolder:
         Backbone atoms and hydrogens are excluded.
         """
         backbone_atoms = {'N', 'CA', 'C', 'O', 'OXT'}
-        by_residue = {}
+        by_residue: dict[int, list[np.ndarray]] = {}
 
         for pos, (res_id, atom_name, elem) in zip(coords, labels):
             if atom_name in backbone_atoms:
