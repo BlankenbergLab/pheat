@@ -86,6 +86,7 @@ from pheat.scoring import (
     validate_scoring_options,
 )
 from pheat.software_provenance import collect_software_provenance
+from pheat.nerf import NerfFolder
 
 try:
     __version__ = version("pheat")
@@ -152,6 +153,7 @@ __all__ = [
     "structure_to_mmcif_string",
     "structure_to_pdb_string",
     "structure_to_residue_geometry",
+    "NerfFolder",
     "to_centroid_structure",
     "validate_geometry_table_set",
     "validate_external_scoring_options",

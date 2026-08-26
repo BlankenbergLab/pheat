@@ -948,7 +948,7 @@ def score_structure(
     hydrophobic_gamma: float = 15.0,
     hydrophobic_burial_denominator: float = 35.0,
     hydrophobic_burial_scale: float = 0.7,
-    end_to_end_weight: float = 8.0,
+    end_to_end_weight: Optional[float] = None,
     end_to_end_target: Optional[float] = None,
     end_to_end_slack: Optional[float] = None,
     hbond_weight: float = 1.0,
@@ -969,11 +969,14 @@ def score_structure(
     decoded_torsions: Optional[Mapping[str, Any]] = None,
     use_end_to_end_constraint: bool = True,
     end_to_end_scale: float = 1.0,
+    legacy_qtf_compatibility: bool = False,
     status_stream: Optional[Any] = None,
 ) -> EnergyResult:
     """Score an atom structure with an explicitly named backend."""
 
     normalized = normalize_score_model_id(model)
+    if end_to_end_weight is None:
+        end_to_end_weight = 8.0 if normalized == "pheat-custom-energy-v1" else 50.0
     filtered, coverage = filter_structure_for_domain(structure, domain=domain)
     tables = load_score_table_set(table_set)
     contract = score_input_contract(normalized)
@@ -1144,6 +1147,7 @@ def score_structure(
                 end_to_end_weight=end_to_end_weight,
                 end_to_end_target=end_to_end_target,
                 end_to_end_slack=end_to_end_slack,
+                legacy_qtf_compatibility=legacy_qtf_compatibility,
                 hbond_weight=hbond_weight,
                 electrostatic_weight=electrostatic_weight,
                 disulfide_weight=disulfide_weight,
@@ -2230,6 +2234,7 @@ def _score_pheat_coarse_protein_folding_v1(
     decoded_torsions: Optional[Mapping[str, Any]] = None,
     use_end_to_end_constraint: bool = True,
     end_to_end_scale: float = 1.0,
+    legacy_qtf_compatibility: bool = False,
 ) -> EnergyResult:
     """Coarse protein folding objective matching the legacy staged folding terms."""
 
@@ -2252,6 +2257,7 @@ def _score_pheat_coarse_protein_folding_v1(
     atoms_by_residue = structure.atoms_by_residue()
     atom_to_res = [residue_index.get(atom.residue_key, 0) for atom in structure.atoms]
     terminal_residue_keys = _terminal_residue_keys_by_chain(residues)
+    legacy_qtf = bool(legacy_qtf_compatibility) or str((structure.metadata or {}).get("rebuild_method", "")).strip().lower() == "nerf"
     target = float(end_to_end_target) if end_to_end_target is not None else 4.5 + 0.40 * max(0, len(residues) - 5)
     slack = float(end_to_end_slack) if end_to_end_slack is not None else 1.5 + 0.05 * len(residues)
     torsions, ignored_torsions = _normalize_decoded_torsions(decoded_torsions, residue_keys=residues)
@@ -2287,8 +2293,11 @@ def _score_pheat_coarse_protein_folding_v1(
         hydrophobic_gamma=float(hydrophobic_gamma),
         burial_denominator=float(hydrophobic_burial_denominator),
         burial_scale=float(hydrophobic_burial_scale),
+        legacy_qtf=legacy_qtf,
     )
-    terms["hbond"] = float(hbond_weight) * _coarse_hbond_term(structure, residue_index=residue_index)
+    terms["hbond"] = float(hbond_weight) * _coarse_hbond_term(
+        structure, residue_index=residue_index, legacy_qtf=legacy_qtf
+    )
     terms["electrostatic"] = float(electrostatic_weight) * _coarse_electrostatic_term(
         structure,
         atom_to_res=atom_to_res,
@@ -2369,7 +2378,7 @@ def _coarse_geometry_integrity_term(structure: HeavyAtomStructure) -> tuple[floa
 
     atoms_by_residue = structure.atoms_by_residue()
     residues = structure.residue_keys()
-    terms = {"pro_ring": 0.0, "chirality": 0.0, "planarity": 0.0}
+    terms = {"chirality": 0.0, "planarity": 0.0}
     for index, residue_key in enumerate(residues):
         atoms = {atom.name.strip().upper(): atom for atom in atoms_by_residue[residue_key]}
         if all(name in atoms for name in ("CA", "N", "C", "CB")):
@@ -2380,11 +2389,14 @@ def _coarse_geometry_integrity_term(structure: HeavyAtomStructure) -> tuple[floa
             )
             if volume < 1.0:
                 terms["chirality"] += 50.0 * (1.0 - volume) ** 2
-        if index >= len(residues) - 1 or residues[index + 1][0] != residue_key[0]:
+        if index >= len(residues) - 1:
+            continue
+        next_key = residues[index + 1]
+        if next_key[0] != residue_key[0] or int(next_key[1]) - int(residue_key[1]) != 1:
             continue
         next_atoms = {
             atom.name.strip().upper(): atom
-            for atom in atoms_by_residue[residues[index + 1]]
+            for atom in atoms_by_residue[next_key]
         }
         if not all(name in atoms for name in ("CA", "C")) or not all(
             name in next_atoms for name in ("N", "CA")
@@ -2511,6 +2523,7 @@ def _coarse_hydrophobic_burial_term(
     hydrophobic_gamma: float,
     burial_denominator: float = 15.0,
     burial_scale: float = 1.0,
+    legacy_qtf: bool = False,
 ) -> float:
     hydrophobic_residues = {"ALA", "VAL", "LEU", "ILE", "MET", "PHE", "TYR", "TRP", "PRO", "CYS"}
     hydrophobic_atoms = []
@@ -2527,7 +2540,15 @@ def _coarse_hydrophobic_burial_term(
     if not hydrophobic_atoms:
         return 0.0
     energy = 0.0
-    heavy_atoms = [atom for atom in structure.atoms if atom.element.strip().upper() not in {"H", "D", "T"}]
+    # The archived QTF scorer counted all serialized atoms when estimating
+    # hydrophobic burial, including explicit legacy hydrogens. Preserve that
+    # behavior for NERF-compatible structures; the PHEAT representation remains
+    # heavy-atom-only by default.
+    heavy_atoms = (
+        list(structure.atoms)
+        if legacy_qtf
+        else [atom for atom in structure.atoms if atom.element.strip().upper() not in {"H", "D", "T"}]
+    )
     for atom in hydrophobic_atoms:
         neighbor_count = 0.0
         for other in heavy_atoms:
@@ -2544,20 +2565,29 @@ def _coarse_hbond_term(
     structure: HeavyAtomStructure,
     *,
     residue_index: Mapping[tuple[str, int, str, str, str], int],
+    legacy_qtf: bool = False,
 ) -> float:
     lookup = structure.atom_lookup()
     n_atoms = [atom for atom in structure.atoms if atom.name.strip().upper() == "N"]
     o_atoms = [atom for atom in structure.atoms if atom.name.strip().upper() == "O"]
     energy = 0.0
     residue_keys = structure.residue_keys()
-    for n_atom in n_atoms:
+    for n_index, n_atom in enumerate(n_atoms):
         key = n_atom.residue_key
         res_d = residue_index.get(key)
         if res_d is None:
             continue
         ca_atom = lookup.get((key, "CA"))
-        prev_c = None
-        if res_d > 0:
+        if legacy_qtf:
+            # Archived QTF inferred the donor geometry from positional atom
+            # indices (C = N-index-2, CA = N-index+1), rather than residue-key
+            # lookup. This matters for legacy side-chain/hydrogen ordering.
+            ordered_index = next((i for i, atom in enumerate(structure.atoms) if atom is n_atom), -1)
+            prev_c = structure.atoms[ordered_index - 2] if ordered_index >= 2 and structure.atoms[ordered_index - 2].name.strip().upper() == "C" else None
+            ca_atom = structure.atoms[ordered_index + 1] if ordered_index + 1 < len(structure.atoms) else None
+        else:
+            prev_c = None
+        if not legacy_qtf and res_d > 0:
             prev_key = residue_keys[res_d - 1]
             if prev_key[0] == key[0]:
                 prev_c = lookup.get((prev_key, "C"))
@@ -2632,6 +2662,13 @@ def _coarse_omega_term(
             continue
         val = float(omega)
         if not math.isfinite(val):
+            continue
+        if legacy_qtf_omega_zero := (val == 0.0):
+            # Archived QTF treats a zero omega sentinel as trans (π) for the
+            # centered omega preference, while still applying the window
+            # violation diagnostic separately.
+            val = omega_center
+            energy += 0.0
             continue
         if -omega_max <= val <= -omega_min:
             val = (2.0 * math.pi) + val
@@ -4287,10 +4324,23 @@ def _run_gromacs_energy_workflow(
         minimize_log = work_dir / "minimize.log"
         minimize_text = minimize_log.read_text(encoding="utf-8", errors="replace") if minimize_log.exists() else ""
         force_matches = re.findall(
-            r"Maximum force\s*=\s*([0-9.eE+\-]+)",
+            r"Maximum\s+force\s*=\s*([0-9.eE+\-]+)",
             minimize_text,
+            flags=re.IGNORECASE,
         )
-        final_max_force = float(force_matches[-1]) if force_matches else math.nan
+        if force_matches:
+            final_max_force = float(force_matches[-1])
+        else:
+            # Some GROMACS builds emit the convergence summary without a
+            # parseable force line in the per-run log.  The summary itself is
+            # authoritative for the requested threshold; use that threshold
+            # as a conservative bound rather than reporting NaN.
+            convergence = re.search(
+                r"converged\s+to\s+Fmax\s*<\s*([0-9.eE+\-]+)",
+                minimize_text,
+                flags=re.IGNORECASE,
+            )
+            final_max_force = float(convergence.group(1)) if convergence else math.nan
         if not math.isfinite(final_max_force) or final_max_force > float(settings.emtol):
             raise RuntimeError(
                 "GROMACS minimization did not converge to the requested force threshold "
