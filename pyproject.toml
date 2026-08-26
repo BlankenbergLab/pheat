@@ -12,7 +12,9 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "PHEAT contributors" }]
 dependencies = [
+  "numpy",
   "platformdirs",
+  "scipy",
 ]
 
 [project.urls]
