@@ -2663,7 +2663,7 @@ def _coarse_omega_term(
         val = float(omega)
         if not math.isfinite(val):
             continue
-        if legacy_qtf_omega_zero := (val == 0.0):
+        if val == 0.0:
             # Archived QTF treats a zero omega sentinel as trans (π) for the
             # centered omega preference, while still applying the window
             # violation diagnostic separately.

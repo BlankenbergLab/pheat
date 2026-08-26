@@ -100,12 +100,7 @@ logger = logging.getLogger(__name__)
 # Optional Numba acceleration
 # ---------------------------------------------------------------------------
 try:
-    from qtf.utils.accelerate import (
-        distance_matrix as _dist_accel,
-        electrostatic_energy as _elec_accel,
-        vdw_repulsion as _vdw_accel,
-        sasa_energy as _sasa_accel,
-    )
+    import qtf.utils.accelerate as _qtf_accel  # noqa: F401
 
     _ACCELERATE_AVAILABLE = True
 except ImportError:
@@ -1095,8 +1090,10 @@ class NerfFolder:
         for _ in range(reps):
             # Single-qubit rotation layer
             for q in range(n_qubits):
-                qc.ry(params[p_idx], q); p_idx += 1
-                qc.rz(params[p_idx], q); p_idx += 1
+                qc.ry(params[p_idx], q)
+                p_idx += 1
+                qc.rz(params[p_idx], q)
+                p_idx += 1
             # Even-pair entanglement: (0,1), (2,3), …
             for q in range(0, n_qubits - 1, 2):
                 qc.cx(q, q + 1)
@@ -1106,8 +1103,10 @@ class NerfFolder:
 
         # Final rotation layer (no entanglement after)
         for q in range(n_qubits):
-            qc.ry(params[p_idx], q); p_idx += 1
-            qc.rz(params[p_idx], q); p_idx += 1
+            qc.ry(params[p_idx], q)
+            p_idx += 1
+            qc.rz(params[p_idx], q)
+            p_idx += 1
 
         return qc
 
@@ -1123,8 +1122,11 @@ class NerfFolder:
         - bond_angle: Angle b-c-d
         - torsion: Dihedral angle a-b-c-d
         """
-        bc = c - b; bc_u = bc / (np.linalg.norm(bc) + 1e-9)
-        ab = b - a; n = np.cross(ab, bc_u); n_u = n / (np.linalg.norm(n) + 1e-9)
+        bc = c - b
+        bc_u = bc / (np.linalg.norm(bc) + 1e-9)
+        ab = b - a
+        n = np.cross(ab, bc_u)
+        n_u = n / (np.linalg.norm(n) + 1e-9)
         bx_n = np.cross(n_u, bc_u)
 
         # Construct rotation matrix column-wise
@@ -1510,12 +1512,15 @@ class NerfFolder:
             if res_name == 'H':
                 # Histidine NE2 carries the old HE2 donor-H charge in the QTF
                 # coarse effective model; HE2 itself remains neutral.
-                if name == 'NE2': q = 0.0
-                if name == 'ND1': q = -0.4
+                if name == 'NE2':
+                    q = 0.0
+                if name == 'ND1':
+                    q = -0.4
 
             # Apply Terminal Capping Logic (Neutralize ends usually)
             if rid == 0 or rid == self.n_residues - 1:
-                if name in ['N', 'CA', 'C', 'O', 'OXT', 'H1', 'H2', 'H3', 'H']: q = 0.0
+                if name in ['N', 'CA', 'C', 'O', 'OXT', 'H1', 'H2', 'H3', 'H']:
+                    q = 0.0
             self.q_vector[k] = q
 
         # 3. Pre-calculate atom-typed LJ radii / epsilons (Vectorized)
@@ -1719,13 +1724,20 @@ class NerfFolder:
             idx_prev_c = i_n - 2
 
             if idx_prev_c < 0 or self.atom_names[idx_prev_c] != 'C':
-                pos_h = coords[i_n] + np.array([0,0,1.0]); pos_n = coords[i_n]
+                pos_h = coords[i_n] + np.array([0, 0, 1.0])
+                pos_n = coords[i_n]
             else:
-                p_c = coords[idx_prev_c]; p_n = coords[i_n]; p_ca = coords[idx_ca]
-                v_nc = p_c - p_n; v_nc /= np.linalg.norm(v_nc)
-                v_nca = p_ca - p_n; v_nca /= np.linalg.norm(v_nca)
-                v_h = -(v_nc + v_nca); v_h /= np.linalg.norm(v_h)
-                pos_h = p_n + v_h * 1.01; pos_n = p_n
+                p_c = coords[idx_prev_c]
+                p_n = coords[i_n]
+                p_ca = coords[idx_ca]
+                v_nc = p_c - p_n
+                v_nc /= np.linalg.norm(v_nc)
+                v_nca = p_ca - p_n
+                v_nca /= np.linalg.norm(v_nca)
+                v_h = -(v_nc + v_nca)
+                v_h /= np.linalg.norm(v_h)
+                pos_h = p_n + v_h * 1.01
+                pos_n = p_n
 
             o_coords = coords[self.idx_O_atoms]
             o_res = self.atom_to_res[self.idx_O_atoms]
@@ -1742,7 +1754,8 @@ class NerfFolder:
             final_d_ho = d_ho[close_mask]
             final_o_coords = valid_o_coords[close_mask]
 
-            v_hn = pos_n - pos_h; v_hn /= np.linalg.norm(v_hn)
+            v_hn = pos_n - pos_h
+            v_hn /= np.linalg.norm(v_hn)
             v_ho = final_o_coords - pos_h
             norms = np.linalg.norm(v_ho, axis=1)[:, None]
             v_ho /= norms
@@ -1892,7 +1905,8 @@ class NerfFolder:
         e_rama = 0.0
         for i in range(self.n_residues):
             if f"{i}_phi" in angle_dict and f"{i}_psi" in angle_dict:
-                phi = angle_dict[f"{i}_phi"]; psi = angle_dict[f"{i}_psi"]
+                phi = angle_dict[f"{i}_phi"]
+                psi = angle_dict[f"{i}_psi"]
                 aa = self.sequence[i]
                 d_helix = (phi - (-1.0))**2 + (psi - (-0.8))**2
                 d_sheet = (phi - (-2.3))**2 + (psi - (2.4))**2
@@ -2084,18 +2098,22 @@ class NerfFolder:
                     centroid = np.mean(ring_atoms, axis=0)
                     v1 = ring_atoms[1] - ring_atoms[0]
                     v2 = ring_atoms[2] - ring_atoms[0]
-                    normal = np.cross(v1, v2); normal /= (np.linalg.norm(normal)+1e-9)
+                    normal = np.cross(v1, v2)
+                    normal /= (np.linalg.norm(normal)+1e-9)
                     aromatics.append((centroid, normal))
 
         energy_pi = 0.0
         n_aro = len(aromatics)
-        if n_aro < 2: return 0.0
+        if n_aro < 2:
+            return 0.0
 
         for i in range(n_aro):
             for j in range(i+1, n_aro):
-                c1, n1 = aromatics[i]; c2, n2 = aromatics[j]
+                c1, n1 = aromatics[i]
+                c2, n2 = aromatics[j]
                 dist = np.linalg.norm(c1 - c2)
-                if dist > 7.0: continue
+                if dist > 7.0:
+                    continue
                 alignment = abs(np.dot(n1, n2))
                 # T-stacking vs Parallel Stacking
                 if alignment < 0.3 and 4.5 < dist < 6.0:
@@ -2198,7 +2216,6 @@ class NerfFolder:
                         n2 /= n2_norm
                         parallelism = np.dot(n1, n2)
 
-                        next_seq = self.sequence[r + 1]
                         # For peptide planarity, we care that the planes are either parallel OR anti-parallel.
                         # Both correspond to a planar peptide geometry.
                         twist_penalty = 1.0 - abs(parallelism)
