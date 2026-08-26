@@ -2069,6 +2069,7 @@ def _score_pheat_physics(
     geometry_integrity_weight: float = 1.0,
     physical_integrity_weight: float = 0.0,
     adjacent_heavy_steric_weight: float = 1.0,
+    legacy_qtf_compatibility: bool = False,
 ) -> EnergyResult:
     """General PHEAT physical objective for coarse-to-fine structure scoring."""
 
