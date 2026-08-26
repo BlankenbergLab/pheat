@@ -31,7 +31,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import numpy as np
 from scipy.optimize import minimize
@@ -2606,7 +2606,7 @@ class NerfFolder:
         from qtf.utils.pdb import _format_atom_line as _fmt
         return _fmt(serial, atom_name, res_name, chain_id, resseq, x, y, z, element)
 
-    def save_pdb(self, coords, labels, filename="structure.pdb", energy=0.0, chain_id='A', resseqs=None, resnames=None, remarks=None, include_hydrogens=True):
+    def save_pdb(self, coords: Any, labels: Any, filename: Union[str, Path] = "structure.pdb", energy: float = 0.0, chain_id: str = 'A', resseqs: Optional[Union[List, Dict]] = None, resnames: Optional[Union[List, Dict]] = None, remarks: Optional[Iterable[str]] = None, include_hydrogens: bool = True) -> None:
         """
         Save arbitrary coordinates/labels to a PDB file viewable in PyMOL or Chimera.
 
