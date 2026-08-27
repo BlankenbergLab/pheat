@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
+import tempfile
 from importlib import resources
 from pathlib import Path
-import tempfile
 from typing import Any, Callable, Dict, List, Mapping, Optional, Union, cast
 from urllib.request import urlretrieve
 
@@ -59,8 +59,8 @@ def run_example_set(
 
     from pheat.centroid import to_centroid_structure
     from pheat.pdbio import load_pdb
-    from pheat.scoring import score_structure
     from pheat.residue_geometry import structure_from_residue_geometry
+    from pheat.scoring import score_structure
 
     if fetch:
         fetch_example_set(name, cache_dir)

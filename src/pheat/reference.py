@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from concurrent.futures import ProcessPoolExecutor
 import copy
-from datetime import datetime, timezone
 import hashlib
 import json
 import math
 import random
 import re
 import shutil
+from concurrent.futures import ProcessPoolExecutor
+from datetime import datetime, timezone
 from pathlib import Path
 from time import monotonic
 from typing import Any, Callable, Mapping, Optional, Sequence, Union
@@ -41,15 +41,14 @@ from pheat.training import (
     InventoryOptions,
     SelectionOptions,
     build_score_tables,
+    inventory_snapshot,
     load_training_entry_structure,
     load_training_structure,
     normalize_sequence_identity_threshold,
     normalize_workers,
     select_corpus,
     train_linear_model,
-    inventory_snapshot,
 )
-
 
 DEFAULT_REFERENCE_ROOT = Path(".pheat-cache/reference-builds")
 DEFAULT_REFERENCE_ARTIFACT_VERSION = "v0"
@@ -193,16 +192,6 @@ REFERENCE_DECOY_DATASETS = (
         "id": "itasser",
         "name": "I-TASSER/Zhang Lab decoy resources",
         "urls": ["https://zhanggroup.org/"],
-        "expected_payloads": [],
-        "license_status": "dataset-specific",
-        "local_use_only": True,
-        "packageable": False,
-        "notes": ["Register local files explicitly unless a stable public payload URL is supplied."],
-    },
-    {
-        "id": "rosetta",
-        "name": "Rosetta decoy resources",
-        "urls": ["https://www.rosettacommons.org/"],
         "expected_payloads": [],
         "license_status": "dataset-specific",
         "local_use_only": True,

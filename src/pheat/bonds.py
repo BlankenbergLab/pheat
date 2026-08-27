@@ -8,7 +8,6 @@ from pheat.geometry import distance
 from pheat.models import Atom, Bond, HeavyAtomStructure, ResidueKey
 from pheat.residues import SIDECHAIN_STEPS
 
-
 BOND_STORAGE_MODES = ("none", "declared", "template", "all")
 
 _BACKBONE_BONDS = (("N", "CA"), ("CA", "C"), ("C", "O"), ("C", "OXT"))

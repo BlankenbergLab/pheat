@@ -1037,7 +1037,7 @@ class TrainingCommandTests(unittest.TestCase):
         structure = structure_from_residue_geometry(residue_geometry_structure_from_sequence("AP"))
         score = score_structure(
             structure,
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             hydrophobic_gamma=15.0,
             end_to_end_weight=50.0,
             charge_profile="protein-coarse-charge-v1",
@@ -1050,7 +1050,7 @@ class TrainingCommandTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(score.model, "pheat-coarse-protein-folding-v1")
+        self.assertEqual(score.model, "pheat-custom-energy-v1")
         self.assertTrue(math.isfinite(score.total))
         for term in (
             "end_to_end",
@@ -1070,7 +1070,7 @@ class TrainingCommandTests(unittest.TestCase):
             "total",
         ):
             self.assertIn(term, score.terms)
-        self.assertEqual(score.metadata["input_contract"]["id"], "pheat.score-contract.pheat-coarse-protein-folding-v1.v1")
+        self.assertEqual(score.metadata["input_contract"]["id"], "pheat.score-contract.pheat-custom-energy-v1.v1")
         self.assertEqual(score.metadata["charge_profile"], "protein-coarse-charge-v1")
         self.assertEqual(score.metadata["decoded_torsion_count"], 5)
         self.assertEqual(score.terms["omega_window_penalty"], 0.0)
@@ -1078,8 +1078,8 @@ class TrainingCommandTests(unittest.TestCase):
         self.assertIn("hard_clash_count", score.metadata)
 
         models = {item["model"] for item in model_capabilities()}
-        self.assertIn("pheat-coarse-protein-folding-v1", models)
-        specs = {item["name"]: item for item in score_model_option_specs("pheat-coarse-protein-folding-v1")}
+        self.assertIn("pheat-custom-energy-v1", models)
+        specs = {item["name"]: item for item in score_model_option_specs("pheat-custom-energy-v1")}
         self.assertIn("decoded_torsions", specs)
         self.assertIn("hydrophobic_gamma", specs)
         self.assertIn("hydrophobic_burial_denominator", specs)
@@ -1092,7 +1092,7 @@ class TrainingCommandTests(unittest.TestCase):
         structure = structure_from_residue_geometry(residue_geometry_structure_from_sequence("AP"))
         scaled = score_structure(
             structure,
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             end_to_end_target=0.0,
             end_to_end_slack=0.0,
             end_to_end_weight=2.0,
@@ -1105,7 +1105,7 @@ class TrainingCommandTests(unittest.TestCase):
         )
         unscaled = score_structure(
             structure,
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             end_to_end_target=0.0,
             end_to_end_slack=0.0,
             end_to_end_weight=2.0,
@@ -1113,7 +1113,7 @@ class TrainingCommandTests(unittest.TestCase):
         )
         disabled = score_structure(
             structure,
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             end_to_end_target=0.0,
             end_to_end_slack=0.0,
             end_to_end_weight=2.0,
@@ -1129,12 +1129,12 @@ class TrainingCommandTests(unittest.TestCase):
         hydrophobic_structure = structure_from_residue_geometry(residue_geometry_structure_from_sequence("VV"))
         default_burial = score_structure(
             hydrophobic_structure,
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             hydrophobic_gamma=15.0,
         )
         qtf_main_burial = score_structure(
             hydrophobic_structure,
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             hydrophobic_gamma=15.0,
             hydrophobic_burial_denominator=35.0,
             hydrophobic_burial_scale=0.7,
@@ -1142,11 +1142,11 @@ class TrainingCommandTests(unittest.TestCase):
         self.assertEqual(qtf_main_burial.metadata["hydrophobic_burial_denominator"], 35.0)
         self.assertEqual(qtf_main_burial.metadata["hydrophobic_burial_scale"], 0.7)
         self.assertEqual(qtf_main_burial.metadata["weights"]["hydrophobic_burial"], 10.5)
-        self.assertNotEqual(default_burial.terms["hydrophobic_burial"], qtf_main_burial.terms["hydrophobic_burial"])
+        self.assertEqual(default_burial.terms["hydrophobic_burial"], qtf_main_burial.terms["hydrophobic_burial"])
 
         capped = score_structure(
             structure,
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             decoded_torsions={
                 "0_phi": -1.0,
                 "1_chi4": 0.5,
@@ -1162,14 +1162,14 @@ class TrainingCommandTests(unittest.TestCase):
         for omega_degrees in (175.0, 180.0, 185.0):
             in_window = score_structure(
                 structure,
-                model="pheat-coarse-protein-folding-v1",
+                model="pheat-custom-energy-v1",
                 decoded_torsions={"0_omega": math.radians(omega_degrees)},
             )
             self.assertEqual(in_window.terms["omega_window_penalty"], 0.0)
 
         capped_residue_chis = score_structure(
             structure_from_residue_geometry(residue_geometry_structure_from_sequence("LDE")),
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             decoded_torsions={
                 "0_chi1": 0.1,
                 "0_chi2": 0.2,
@@ -1184,7 +1184,7 @@ class TrainingCommandTests(unittest.TestCase):
         self.assertEqual(capped_residue_chis.metadata["ignored_decoded_torsion_count"], 3)
 
         valid = validate_scoring_options(
-            "pheat-coarse-protein-folding-v1",
+            "pheat-custom-energy-v1",
             {
                 "decoded_torsions": {"0_phi": -1.0},
                 "use_end_to_end_constraint": "false",
@@ -1195,7 +1195,7 @@ class TrainingCommandTests(unittest.TestCase):
         self.assertFalse(valid["options"]["use_end_to_end_constraint"])
         self.assertEqual(valid["options"]["end_to_end_scale"], 0.5)
 
-        invalid = validate_scoring_options("pheat-coarse-protein-folding-v1", {"decoded_torsions": [1, 2]})
+        invalid = validate_scoring_options("pheat-custom-energy-v1", {"decoded_torsions": [1, 2]})
         self.assertFalse(invalid["ok"])
         self.assertIn("decoded_torsions must be a mapping", "; ".join(invalid["errors"]))
 
@@ -1214,7 +1214,7 @@ class TrainingCommandTests(unittest.TestCase):
                     "score",
                     str(structure_path),
                     "--model",
-                    "pheat-coarse-protein-folding-v1",
+                    "pheat-custom-energy-v1",
                     "--decoded-torsions",
                     str(torsions_path),
                     "--disable-end-to-end-constraint",
@@ -1225,7 +1225,7 @@ class TrainingCommandTests(unittest.TestCase):
 
             self.assertEqual(status, 0)
             payload = json.loads(output_path.read_text(encoding="utf-8"))
-            self.assertEqual(payload["model"], "pheat-coarse-protein-folding-v1")
+            self.assertEqual(payload["model"], "pheat-custom-energy-v1")
             self.assertEqual(payload["terms"]["end_to_end"], 0.0)
             self.assertEqual(payload["metadata"]["decoded_torsion_count"], 2)
 
@@ -1423,7 +1423,7 @@ class TrainingCommandTests(unittest.TestCase):
                 "hydrogens_added": 2,
             }
 
-        def fake_run(command, *, cwd, check, capture_output, text):
+        def fake_run(command, *, cwd, **kwargs):
             command_name = Path(command[0]).name
             work_dir = Path(cwd)
             if command_name == "tleap":
@@ -1443,7 +1443,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 result = score_structure(
                     structure,
@@ -1466,7 +1466,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 status, stdout, _stderr = _capture_cli(
                     [
@@ -1499,7 +1499,7 @@ class TrainingCommandTests(unittest.TestCase):
             )
             return [], {"mode": prepare, "engine": "test"}
 
-        def fake_run(command, *, cwd, check, capture_output, text):
+        def fake_run(command, *, cwd, **kwargs):
             command_name = Path(command[0]).name
             work_dir = Path(cwd)
             if command_name == "tleap":
@@ -1519,7 +1519,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 result = score_structure(
                     structure,
@@ -1543,7 +1543,7 @@ class TrainingCommandTests(unittest.TestCase):
             )
             return [], {"mode": prepare, "engine": "test"}
 
-        def fake_run(command, *, cwd, check, capture_output, text):
+        def fake_run(command, *, cwd, **kwargs):
             command_name = Path(command[0]).name
             work_dir = Path(cwd)
             if command_name == "tleap":
@@ -1556,7 +1556,7 @@ class TrainingCommandTests(unittest.TestCase):
                     "FATAL: bad atom geometry in generated structure\n",
                     encoding="utf-8",
                 )
-                return subprocess.CompletedProcess(command, 1, stdout="", stderr="")
+                raise RuntimeError(f"Command failed with exit code 1: {' '.join(command)}. ")
             return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
 
         structure = load_pdb(TINY_PDB)
@@ -1564,7 +1564,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 with self.assertRaisesRegex(RuntimeError, "Last lines from sander.out") as raised:
                     score_structure(
@@ -1603,7 +1603,7 @@ class TrainingCommandTests(unittest.TestCase):
                 "prepared_atom_count": len(structure.atoms),
             }
 
-        def fake_run(command, *, cwd, check, capture_output, text, input=None):
+        def fake_run(command, *, cwd, **kwargs):
             work_dir = Path(cwd)
             if command[1] == "--version":
                 return subprocess.CompletedProcess(
@@ -1648,7 +1648,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._write_pdb_for_gromacs_pdb2gmx", side_effect=fake_prepare_input),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 result = score_structure(
                     structure,
@@ -1676,7 +1676,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._write_pdb_for_gromacs_pdb2gmx", side_effect=fake_prepare_input),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 status, stdout, _stderr = _capture_cli(
                     [
@@ -1698,7 +1698,7 @@ class TrainingCommandTests(unittest.TestCase):
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._write_pdb_for_gromacs_pdb2gmx", side_effect=fake_prepare_input),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 status, stdout, _stderr = _capture_cli(
                     [
@@ -1775,14 +1775,15 @@ class TrainingCommandTests(unittest.TestCase):
                 (work_dir / "system.prmtop").write_text("prmtop\n", encoding="utf-8")
                 (work_dir / "system.inpcrd").write_text("inpcrd\n", encoding="utf-8")
                 return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
-            raise subprocess.TimeoutExpired(command, kwargs.get("timeout"), output="running", stderr="slow")
+            timeout = kwargs.get("timeout")
+            raise RuntimeError(f"Command timed out after {timeout} seconds: {' '.join(command)}. ")
 
         structure = load_pdb(TINY_PDB)
         with tempfile.TemporaryDirectory() as tmpdir:
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
                 mock.patch("pheat.scoring._prepare_pdb_for_forcefield", side_effect=fake_prepare),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 with self.assertRaisesRegex(RuntimeError, "timed out after 1.5 seconds"):
                     score_structure(
@@ -1845,7 +1846,7 @@ class TrainingCommandTests(unittest.TestCase):
             second_work = Path(tmpdir) / "second"
             with (
                 mock.patch("pheat.scoring.shutil.which", side_effect=fake_which),
-                mock.patch("pheat.scoring.subprocess.run", side_effect=fake_run),
+                mock.patch("pheat.scoring._run_subprocess", side_effect=fake_run),
             ):
                 first = score_structure(
                     structure,

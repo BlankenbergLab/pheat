@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pheat"
-version = "0.1.0"
+version = "0.2.0"
 description = "Protein Heavy-atom Energy and Analysis Toolkit."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -12,7 +12,9 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "PHEAT contributors" }]
 dependencies = [
+  "numpy",
   "platformdirs",
+  "scipy",
 ]
 
 [project.urls]
@@ -131,6 +133,9 @@ pheat = ["data/**/*.json", "data/**/*.json.xz", "schemas/**/*.json"]
 [tool.ruff]
 line-length = 100
 target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

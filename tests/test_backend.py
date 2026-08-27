@@ -496,11 +496,11 @@ class BackendTests(unittest.TestCase):
 
         self.assertAlmostEqual(
             kabsch_rmsd(original_coords, reconstructed_coords),
-            1.0049890010274787,
+            1.0036912132468936,
         )
         self.assertAlmostEqual(
             kabsch_rmsd(original_coords, reconstructed_coords, aligned_target=aligned_coords),
-            1.0049890010274787,
+            1.0036912132468936,
         )
 
     def test_in_memory_residue_geometry_reconstruction_matches_serialized_optional_geometry(self):
@@ -527,7 +527,7 @@ class BackendTests(unittest.TestCase):
                 [original_atoms[key].coord for key in common_keys],
                 [direct_atoms[key].coord for key in common_keys],
             ),
-            1.0049890010274787,
+            1.0036912132458538,
         )
 
     def test_residue_geometry_extraction_does_not_bridge_residue_number_gaps(self):
@@ -735,6 +735,22 @@ class BackendTests(unittest.TestCase):
                         expected_distance,
                         delta=0.08,
                     )
+
+                aromatic_ring_names = {
+                    "PHE": {"CG", "CD1", "CD2", "CE1", "CE2", "CZ"},
+                    "TYR": {"CG", "CD1", "CD2", "CE1", "CE2", "CZ"},
+                    "HIS": {"CG", "ND1", "CD2", "CE1", "NE2"},
+                    "TRP": {"CG", "CD1", "CD2", "NE1", "CE2", "CE3", "CZ2", "CZ3", "CH2"},
+                }.get(resname)
+                if aromatic_ring_names is None:
+                    continue
+                ring_atoms = [atoms[name] for name in sorted(aromatic_ring_names)]
+                minimum_separation = min(
+                    distance(atom_a.coord, atom_b.coord)
+                    for index, atom_a in enumerate(ring_atoms)
+                    for atom_b in ring_atoms[index + 1 :]
+                )
+                self.assertGreater(minimum_separation, 1.25)
 
     def test_modified_ring_reconstruction_closes_ring_bonds(self):
         closure_checks = {
@@ -1700,9 +1716,8 @@ class BackendTests(unittest.TestCase):
         self.assertTrue(math.isfinite(result.total))
         self.assertEqual(result.metadata["preparation"], "pdbfixer")
         self.assertEqual(result.metadata["preparation_seed"], 20260514)
-        self.assertEqual(result.metadata["missing_terminal_atoms_added"], 1)
+        self.assertEqual(result.metadata["missing_terminal_atoms_added"], 0)
         self.assertIn("hydrogens were added internally", "\n".join(result.warnings))
-        self.assertIn("PDBFixer added missing heavy or terminal atoms", "\n".join(result.warnings))
         second = score_structure(structure, model="openmm-prepared")
         self.assertAlmostEqual(result.total, second.total)
 

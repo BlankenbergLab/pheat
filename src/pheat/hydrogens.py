@@ -8,7 +8,6 @@ from typing import Any, Sequence, cast
 
 from pheat.models import Atom, HeavyAtomStructure
 
-
 HYDROGEN_POLICIES = ("drop", "preserve", "generate")
 
 
@@ -31,8 +30,7 @@ def generate_hydrogens(structure: HeavyAtomStructure) -> HeavyAtomStructure:
     """
 
     try:
-        from openmm import Platform, unit
-        from openmm import app
+        from openmm import Platform, app, unit
     except Exception as exc:  # pragma: no cover - depends on optional environment
         raise RuntimeError(
             "Hydrogen generation requires OpenMM. Install PHEAT with `.[all]` "

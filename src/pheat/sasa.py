@@ -11,8 +11,7 @@ from pathlib import Path
 from typing import Sequence
 
 from pheat.geometry import distance
-from pheat.models import ResidueKey, HeavyAtomStructure
-
+from pheat.models import HeavyAtomStructure, ResidueKey
 
 SASA_BACKENDS = ("auto", "freesasa")
 BURIAL_METHODS = ("contacts", "sasa")

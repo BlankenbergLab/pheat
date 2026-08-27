@@ -9,9 +9,8 @@ from __future__ import annotations
 
 from typing import Any, Mapping, Tuple
 
-from pheat.models import Atom, DisulfideBond, HeavyAtomStructure
+from pheat.models import Atom, Bond, DisulfideBond, HeavyAtomStructure
 from pheat.residues import SUPPORTED_RESIDUES
-
 
 SCORING_DOMAINS = ("protein-heavy", "all-heavy", "full")
 
@@ -29,13 +28,14 @@ def filter_structure_for_domain(
 
     normalized = normalize_domain(domain)
     kept_atoms = []
+    kept_indices = []
     ignored = {
         "hydrogen_atom_count": 0,
         "nonprotein_atom_count": 0,
         "unsupported_residue_atom_count": 0,
     }
 
-    for atom in structure.atoms:
+    for original_index, atom in enumerate(structure.atoms):
         element = atom.element.strip().upper()
         resname = atom.resname.strip().upper()
         is_hydrogen = element in {"H", "D", "T"}
@@ -54,12 +54,33 @@ def filter_structure_for_domain(
                 continue
 
         kept_atoms.append(atom)
+        kept_indices.append(original_index)
+
+    # Preserve the explicit covalent graph whenever a domain filter retains
+    # both endpoints.  The coarse QTF scorer uses this graph to mask 1-2/1-3/
+    # 1-4 pairs; dropping it silently changes the van der Waals term and forces
+    # a less reliable distance-based graph inference.
+    old_to_new = {old: new for new, old in enumerate(kept_indices)}
+    filtered_bonds = [
+        Bond(
+            atom_index_1=old_to_new[bond.atom_index_1],
+            atom_index_2=old_to_new[bond.atom_index_2],
+            source=bond.source,
+            length=bond.length,
+            order=bond.order,
+            metadata=dict(bond.metadata),
+        )
+        for bond in structure.bonds
+        if bond.atom_index_1 in old_to_new and bond.atom_index_2 in old_to_new
+    ]
 
     filtered = HeavyAtomStructure(
         atoms=list(kept_atoms),
         name=structure.name,
         metadata=dict(structure.metadata),
         disulfide_bonds=_filter_disulfides(structure.disulfide_bonds, kept_atoms),
+        bonds=filtered_bonds,
+        atom_scope=structure.atom_scope,
     )
     coverage = _coverage_payload(structure, filtered, normalized, ignored)
     return filtered, coverage

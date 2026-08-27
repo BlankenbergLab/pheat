@@ -41,7 +41,7 @@ training/table-generation dependencies, JupyterLab/Mol* widget
 support, the optional FastAPI web app, tests, and linting tools. On Python 3.9, the pip
 extras skip OpenMM/PDBFixer because current pip packages do not provide a
 compatible `pdbfixer`/`openmm>=8.2` set; use Python 3.10+ or the Miniforge
-environment for the `openmm-prepared` path. AmberTools and GROMACS executables are
+environment for the `openmm-prepared` path. AmberTools and GROMACS 2026-or-newer executables are
 available through the conda environment, not pip extras.
 
 Common local checks are available through `make`:
@@ -505,8 +505,8 @@ make reference-validate
 ```
 
 `reference-fetch` records the selected coordinate snapshot and decoy benchmark
-metadata. External benchmark payloads such as 3DRobot, CASP, I-TASSER, and
-Rosetta decoy files are treated as local-use-only unless their license is
+metadata. External benchmark payloads such as 3DRobot, CASP, and I-TASSER
+decoy files are treated as local-use-only unless their license is
 reviewed; PHEAT records source URLs, command settings, SHA-256 checksums, byte
 counts, and registration/download dates, but does not redistribute unclear
 license payloads. Local payloads can be registered with `--local-file
@@ -795,7 +795,7 @@ weights, Huber delta, and cis-or-trans planarity target in result metadata.
 | `pheat-hbond` | Native PHEAT | Heavy-atom donor/acceptor contact geometry and buried-polar term. | arbitrary | Protonation is inferred from heavy atoms and remains ambiguous. |
 | `pheat-rg` | Native PHEAT | Expected-radius-of-gyration compactness penalty. Defaults to C-alpha, unweighted Rg with placeholder coefficients. | arbitrary | Shape score only; fit coefficients from an in-domain corpus before interpreting as a calibrated potential. |
 | `pheat-ml-linear` | Native PHEAT | Lightweight linear combination of PHEAT score features. | arbitrary | Only meaningful with a trained table set from an in-domain corpus. |
-| `pheat-coarse-protein-folding-v1` | Native PHEAT | Coarse folding objective with end-to-end compactness, hydrophobic burial, contact, decoded torsion, aromatic, disulfide, steric, and geometry-integrity terms. | arbitrary | Heuristic lower-is-better objective for staged folding/reranking; not a physical free energy or trained statistical potential. |
+| `pheat-custom-energy-v1` | Native PHEAT | Coarse folding objective with end-to-end compactness, hydrophobic burial, contact, decoded torsion, aromatic, disulfide, steric, and geometry-integrity terms. | arbitrary | Heuristic lower-is-better objective for staged folding/reranking; not a physical free energy or trained statistical potential. |
 | `pheat-geometry-integrity` | Native PHEAT | Robust coordinate-geometry plausibility score for backbone bonds, peptide C-N links, C-alpha chirality, peptide planarity, and proline ring closure. | arbitrary | Geometry-quality diagnostic only; missing atoms are skipped with warnings and the score is not a thermodynamic energy. |
 | `heavy-mm` | Native PHEAT | Heavy-atom Lennard-Jones-like, simple charge, and backbone bond-length penalty terms. | arbitrary | Heavy-atoms-only approximation, not AMBER/OpenMM force-field energy. |
 | `openmm-prepared` | External Python backend | OpenMM AMBER potential after internal OpenMM/PDBFixer preparation. | kJ/mol | Optional dependency path; requires OpenMM to run, uses PDBFixer when available, and may add hydrogens and missing terminal/heavy atoms internally for scoring without modifying input artifacts. |
@@ -804,7 +804,7 @@ weights, Huber delta, and cis-or-trans planarity target in result metadata.
 
 The built-in `generic`, `pheat-dfire`, `pheat-goap`, `pheat-mj`,
 `pheat-hydropathy`, `pheat-backbone`, `pheat-rotamer`, `pheat-hbond`,
-`pheat-rg`, `pheat-ml-linear`, `pheat-coarse-protein-folding-v1`,
+`pheat-rg`, `pheat-ml-linear`, `pheat-custom-energy-v1`,
 `pheat-geometry-integrity`, and `heavy-mm` result metadata labels
 their scale as arbitrary unless an exact external parameter source is added and
 verified. The `pheat-dfire` score is generated from PHEAT's built-in
@@ -815,7 +815,7 @@ the placeholder form `expected_rg = a * residue_count ** b` and reports the
 squared standardized deviation from that expectation; table sets can override
 `atom_set`, `mode`, `a`, `b`, and `sigma_fraction` once fitted coefficients are
 available.
-`pheat-coarse-protein-folding-v1` accepts optional decoded torsion angles in
+`pheat-custom-energy-v1` accepts optional decoded torsion angles in
 radians from the Python API as `decoded_torsions={"0_phi": -1.0, "1_chi1": 0.5}`
 or from the CLI with `--decoded-torsions torsions.json`, where the file is a JSON
 object keyed by zero-based residue index and angle name. Non-numeric or
@@ -979,7 +979,7 @@ Successful OpenMM-prepared scores are reported in kJ/mol.
 
 AmberTools and GROMACS scoring are executable-based and should be installed through
 conda or another system distribution, not pip extras. The repository
-`environment.yml` includes `ambertools` and `gromacs`; `pip install .[all]` installs the
+`environment.yml` includes `ambertools` and `gromacs >=2026`; `pip install .[all]` installs the
 Python optional dependencies but cannot provide `tleap`, `sander`, or `gmx`. Score a
 heavy-atom or partial structure through AMBER preparation with:
 

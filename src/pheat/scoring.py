@@ -2,34 +2,33 @@
 
 from __future__ import annotations
 
-from contextlib import contextmanager
-from copy import deepcopy
-from dataclasses import dataclass, field
 import hashlib
 import importlib
 import itertools
 import json
 import math
 import os
-from pathlib import Path
 import random
 import re
 import shutil
 import subprocess
 import tempfile
 import time
+from contextlib import contextmanager
+from copy import deepcopy
+from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 from pheat.domains import filter_structure_for_domain, merge_coverage_metadata
-from pheat.geometry import cross, dihedral_degrees, distance, dot, normalize, sub
+from pheat.geometry import cross, dihedral_degrees, distance, dot, normalize, place_atom, sub
 from pheat.metrics import RMSD_ATOM_SETS, normalize_rmsd_atom_set, structure_radius_of_gyration
 from pheat.models import Atom, EnergyResult, HeavyAtomStructure, ResidueKey
-from pheat.residue_geometry import C_N, C_O, CA_C, N_CA, PRO_N_CD
+from pheat.residue_geometry import ANGLE_CA_C_O, C_N, C_O, CA_C, N_CA, PRO_N_CD
 from pheat.residues import CANONICAL_RESIDUES, SIDECHAIN_STEPS, SUPPORTED_RESIDUES, THREE_TO_ONE
 from pheat.sasa import SASA_BACKENDS, residue_burial
 from pheat.score_contracts import normalize_score_model_id, score_input_contract
 from pheat.score_tables import default_profile, load_score_table_set, profile_ids, table_for_model
-
 
 # Common van der Waals radii used for broad contact detection. These are
 # Bondi-style approximate radii (source manifest: bondi-1964-vdw-radii) plus a
@@ -104,24 +103,23 @@ _PHEAT_PHYSICS_COMMON_CHARGES = {
     "NE2": 0.5,
     "SG": -0.1,
     "SD": -0.1,
-    "HE2": 0.4,
     "ND1": -0.4,
 }
 _PHEAT_PHYSICS_CHARGE_TABLES = {
     "protein-coarse-charge-v1": {
         "N": -0.42,
-        "H": 0.27,
+        "H": 0.00,
         "CA": 0.00,
         "C": 0.60,
         "O": -0.57,
-        "OG": -0.6,
-        "HG": 0.4,
-        "OG1": -0.6,
-        "HG1": 0.4,
-        "OH": -0.5,
-        "HH": 0.4,
-        "NE1": -0.4,
-        "HE1": 0.3,
+        "OG": -0.2,
+        "HG": 0.0,
+        "OG1": -0.2,
+        "HG1": 0.0,
+        "OH": -0.1,
+        "HH": 0.0,
+        "NE1": -0.1,
+        "HE1": 0.0,
     },
 }
 GENERIC_CONTACT_CUTOFF = 6.0
@@ -145,6 +143,15 @@ COARSE_HARD_CLASH_MIN_A_DEFAULT = 1.20
 COARSE_HARD_CLASH_SCALE_DEFAULT = 5000.0
 COARSE_HARD_CLASH_POWER_DEFAULT = 4.0
 COARSE_HARD_CLASH_14_SCALE_DEFAULT = 0.25
+COARSE_LJ_TYPE_PARAMS = {
+    "H": (1.20, 0.0157), "H_polar": (1.05, 0.0157),
+    "C_backbone": (1.75, 0.0700), "C_carbonyl": (1.70, 0.0860),
+    "C_aliphatic": (1.90, 0.1094), "C_aromatic": (1.85, 0.1200),
+    "N_backbone": (1.65, 0.1700), "N_sidechain": (1.65, 0.1700),
+    "O_carbonyl": (1.60, 0.2100), "O_hydroxyl": (1.55, 0.1700),
+    "O_carboxyl": (1.60, 0.2100), "S_sulfur": (2.00, 0.2500),
+    "X": (1.75, 0.1000),
+}
 COARSE_CHI_CAP_BY_RESIDUE = {
     "CYS": 1,
     "ASP": 1,
@@ -222,7 +229,7 @@ SUPPORTED_MODELS = (
     "pheat-rg",
     "pheat-ml-linear",
     "pheat-physics",
-    "pheat-coarse-protein-folding-v1",
+    "pheat-custom-energy-v1",
     "pheat-geometry-integrity",
     "pheat-physical-integrity",
     "heavy-mm",
@@ -262,7 +269,7 @@ MODEL_METADATA = {
     "pheat-rg": _native_model_metadata("arbitrary"),
     "pheat-ml-linear": _native_model_metadata("arbitrary"),
     "pheat-physics": _native_model_metadata("arbitrary"),
-    "pheat-coarse-protein-folding-v1": _native_model_metadata("arbitrary"),
+    "pheat-custom-energy-v1": _native_model_metadata("arbitrary"),
     "pheat-geometry-integrity": _native_model_metadata("arbitrary"),
     "pheat-physical-integrity": _native_model_metadata("arbitrary"),
     "heavy-mm": _native_model_metadata("arbitrary"),
@@ -559,7 +566,7 @@ def _score_model_option_specs(model: str) -> list[dict[str, Any]]:
                 "Weight applied to the PHEAT physical-integrity penalty.",
             )
         )
-    if model in {"pheat-physics", "pheat-coarse-protein-folding-v1"}:
+    if model in {"pheat-physics", "pheat-custom-energy-v1"}:
         specs.extend(
             [
                 _option_spec(
@@ -570,7 +577,12 @@ def _score_model_option_specs(model: str) -> list[dict[str, Any]]:
                     choices=list(PHEAT_PHYSICS_CHARGE_PROFILES),
                 ),
                 _option_spec("hydrophobic_gamma", "float", 15.0, "Hydrophobic burial penalty scale."),
-                _option_spec("end_to_end_weight", "float", 50.0, "End-to-end compactness/restraint weight."),
+                _option_spec(
+                    "end_to_end_weight",
+                    "float",
+                    8.0 if model == "pheat-custom-energy-v1" else 50.0,
+                    "End-to-end compactness/restraint weight.",
+                ),
                 _option_spec("end_to_end_target", "float", None, "Optional target CA-to-CA end-to-end distance in Angstroms."),
                 _option_spec("end_to_end_slack", "float", None, "Optional dead-band before end-to-end restraint is penalized."),
                 _option_spec("hbond_weight", "float", 1.0, "Hydrogen-bond/contact proxy term weight."),
@@ -586,12 +598,12 @@ def _score_model_option_specs(model: str) -> list[dict[str, Any]]:
         )
         if model == "pheat-physics":
             specs.append(_option_spec("physical_integrity_weight", "float", 0.0, "Additional physical-integrity barrier weight."))
-        if model == "pheat-coarse-protein-folding-v1":
+        if model == "pheat-custom-energy-v1":
             specs.extend(
                 [
                     _option_spec("decoded_torsions", "mapping", None, "Optional decoded torsion angles in radians keyed as residueIndex_angleName, for example 3_phi or 3_chi1."),
-                    _option_spec("hydrophobic_burial_denominator", "float", 15.0, "Neighbor-count denominator for coarse hydrophobic burial saturation."),
-                    _option_spec("hydrophobic_burial_scale", "float", 1.0, "Scale applied to the coarse hydrophobic burial penalty."),
+                _option_spec("hydrophobic_burial_denominator", "float", 35.0, "Neighbor-count denominator matching the QTF coarse objective."),
+                _option_spec("hydrophobic_burial_scale", "float", 0.7, "Scale matching the QTF coarse objective's SASA factor."),
                     _option_spec("use_end_to_end_constraint", "boolean", True, "Whether to apply the end-to-end compactness restraint."),
                     _option_spec("end_to_end_scale", "float", 1.0, "Additional scale multiplier for the end-to-end compactness restraint."),
                     _option_spec("omega_weight", "float", COARSE_OMEGA_SCALE_DEFAULT, "Omega preference weight used for decoded torsion scoring."),
@@ -934,9 +946,9 @@ def score_structure(
     physical_integrity_weight: Optional[float] = None,
     charge_profile: str = "protein-coarse-charge-v1",
     hydrophobic_gamma: float = 15.0,
-    hydrophobic_burial_denominator: float = 15.0,
-    hydrophobic_burial_scale: float = 1.0,
-    end_to_end_weight: float = 50.0,
+    hydrophobic_burial_denominator: float = 35.0,
+    hydrophobic_burial_scale: float = 0.7,
+    end_to_end_weight: Optional[float] = None,
     end_to_end_target: Optional[float] = None,
     end_to_end_slack: Optional[float] = None,
     hbond_weight: float = 1.0,
@@ -957,11 +969,14 @@ def score_structure(
     decoded_torsions: Optional[Mapping[str, Any]] = None,
     use_end_to_end_constraint: bool = True,
     end_to_end_scale: float = 1.0,
+    legacy_qtf_compatibility: bool = False,
     status_stream: Optional[Any] = None,
 ) -> EnergyResult:
     """Score an atom structure with an explicitly named backend."""
 
     normalized = normalize_score_model_id(model)
+    if end_to_end_weight is None:
+        end_to_end_weight = 8.0 if normalized == "pheat-custom-energy-v1" else 50.0
     filtered, coverage = filter_structure_for_domain(structure, domain=domain)
     tables = load_score_table_set(table_set)
     contract = score_input_contract(normalized)
@@ -1132,6 +1147,7 @@ def score_structure(
                 end_to_end_weight=end_to_end_weight,
                 end_to_end_target=end_to_end_target,
                 end_to_end_slack=end_to_end_slack,
+                legacy_qtf_compatibility=legacy_qtf_compatibility,
                 hbond_weight=hbond_weight,
                 electrostatic_weight=electrostatic_weight,
                 disulfide_weight=disulfide_weight,
@@ -1147,7 +1163,7 @@ def score_structure(
             contract=contract,
             contract_warnings=contract_warnings,
         )
-    if normalized == "pheat-coarse-protein-folding-v1":
+    if normalized == "pheat-custom-energy-v1":
         return _with_coverage(
             _score_pheat_coarse_protein_folding_v1(
                 filtered,
@@ -2053,6 +2069,7 @@ def _score_pheat_physics(
     geometry_integrity_weight: float = 1.0,
     physical_integrity_weight: float = 0.0,
     adjacent_heavy_steric_weight: float = 1.0,
+    legacy_qtf_compatibility: bool = False,
 ) -> EnergyResult:
     """General PHEAT physical objective for coarse-to-fine structure scoring."""
 
@@ -2195,9 +2212,9 @@ def _score_pheat_coarse_protein_folding_v1(
     *,
     charge_profile: str = "protein-coarse-charge-v1",
     hydrophobic_gamma: float = 15.0,
-    hydrophobic_burial_denominator: float = 15.0,
-    hydrophobic_burial_scale: float = 1.0,
-    end_to_end_weight: float = 50.0,
+    hydrophobic_burial_denominator: float = 35.0,
+    hydrophobic_burial_scale: float = 0.7,
+    end_to_end_weight: float = 8.0,
     end_to_end_target: Optional[float] = None,
     end_to_end_slack: Optional[float] = None,
     hbond_weight: float = 1.0,
@@ -2218,6 +2235,7 @@ def _score_pheat_coarse_protein_folding_v1(
     decoded_torsions: Optional[Mapping[str, Any]] = None,
     use_end_to_end_constraint: bool = True,
     end_to_end_scale: float = 1.0,
+    legacy_qtf_compatibility: bool = False,
 ) -> EnergyResult:
     """Coarse protein folding objective matching the legacy staged folding terms."""
 
@@ -2225,12 +2243,12 @@ def _score_pheat_coarse_protein_folding_v1(
     if nonfinite:
         penalty = float(1e6 + 1e3 * nonfinite)
         return EnergyResult(
-            model="pheat-coarse-protein-folding-v1",
+            model="pheat-custom-energy-v1",
             total=penalty,
             units="arbitrary",
             terms={"non_finite_penalty": penalty, "total": penalty},
             warnings=[f"non-finite atom coordinates detected: {nonfinite}"],
-            citations=["pheat-coarse-protein-folding-v1"],
+            citations=["pheat-custom-energy-v1"],
             metadata={"description": "coarse protein folding objective", "score_direction": "lower-is-better"},
         )
 
@@ -2240,6 +2258,7 @@ def _score_pheat_coarse_protein_folding_v1(
     atoms_by_residue = structure.atoms_by_residue()
     atom_to_res = [residue_index.get(atom.residue_key, 0) for atom in structure.atoms]
     terminal_residue_keys = _terminal_residue_keys_by_chain(residues)
+    legacy_qtf = bool(legacy_qtf_compatibility) or str((structure.metadata or {}).get("rebuild_method", "")).strip().lower() == "nerf"
     target = float(end_to_end_target) if end_to_end_target is not None else 4.5 + 0.40 * max(0, len(residues) - 5)
     slack = float(end_to_end_slack) if end_to_end_slack is not None else 1.5 + 0.05 * len(residues)
     torsions, ignored_torsions = _normalize_decoded_torsions(decoded_torsions, residue_keys=residues)
@@ -2275,8 +2294,11 @@ def _score_pheat_coarse_protein_folding_v1(
         hydrophobic_gamma=float(hydrophobic_gamma),
         burial_denominator=float(hydrophobic_burial_denominator),
         burial_scale=float(hydrophobic_burial_scale),
+        legacy_qtf=legacy_qtf,
     )
-    terms["hbond"] = float(hbond_weight) * _coarse_hbond_term(structure, residue_index=residue_index)
+    terms["hbond"] = float(hbond_weight) * _coarse_hbond_term(
+        structure, residue_index=residue_index, legacy_qtf=legacy_qtf
+    )
     terms["electrostatic"] = float(electrostatic_weight) * _coarse_electrostatic_term(
         structure,
         atom_to_res=atom_to_res,
@@ -2298,8 +2320,8 @@ def _score_pheat_coarse_protein_folding_v1(
         hard_clash_14_scale=float(hard_clash_14_scale),
     )
     terms["hard_clash"] = hard_clash_value
-    geometry = _score_pheat_geometry_integrity(structure)
-    terms["geometry_integrity"] = float(geometry_integrity_weight) * float(geometry.total)
+    geometry_total, geometry_terms = _coarse_geometry_integrity_term(structure)
+    terms["geometry_integrity"] = float(geometry_integrity_weight) * geometry_total
     adjacent = _pheat_physics_adjacent_heavy_sterics(structure)
     terms["adjacent_heavy_sterics"] = float(adjacent_heavy_steric_weight) * float(adjacent)
 
@@ -2325,12 +2347,12 @@ def _score_pheat_coarse_protein_folding_v1(
         "hard_clash_14_scale": float(hard_clash_14_scale),
     }
     return EnergyResult(
-        model="pheat-coarse-protein-folding-v1",
+        model="pheat-custom-energy-v1",
         total=total,
         units="arbitrary",
         terms=terms,
-        warnings=warnings + list(geometry.warnings),
-        citations=["pheat-coarse-protein-folding-v1", *geometry.citations],
+        warnings=warnings,
+        citations=["pheat-custom-energy-v1"],
         metadata={
             "description": "Coarse staged protein folding objective with compactness, burial, contact, torsion, and geometry terms",
             "score_direction": "lower-is-better",
@@ -2347,9 +2369,51 @@ def _score_pheat_coarse_protein_folding_v1(
             "weights": weights,
             "decoded_torsion_count": len(torsions),
             "ignored_decoded_torsion_count": ignored_torsions,
-            "component_models": {"geometry_integrity": geometry.to_dict()},
+            "geometry_terms": geometry_terms,
         },
     )
+
+
+def _coarse_geometry_integrity_term(structure: HeavyAtomStructure) -> tuple[float, dict[str, float]]:
+    """Match QTF main's chirality and peptide-planarity guardrails."""
+
+    atoms_by_residue = structure.atoms_by_residue()
+    residues = structure.residue_keys()
+    terms = {"chirality": 0.0, "planarity": 0.0}
+    for index, residue_key in enumerate(residues):
+        atoms = {atom.name.strip().upper(): atom for atom in atoms_by_residue[residue_key]}
+        if all(name in atoms for name in ("CA", "N", "C", "CB")):
+            ca = atoms["CA"].coord
+            volume = dot(
+                cross(sub(atoms["N"].coord, ca), sub(atoms["C"].coord, ca)),
+                sub(atoms["CB"].coord, ca),
+            )
+            if volume < 1.0:
+                terms["chirality"] += 50.0 * (1.0 - volume) ** 2
+        if index >= len(residues) - 1:
+            continue
+        next_key = residues[index + 1]
+        if next_key[0] != residue_key[0] or int(next_key[1]) - int(residue_key[1]) != 1:
+            continue
+        next_atoms = {
+            atom.name.strip().upper(): atom
+            for atom in atoms_by_residue[next_key]
+        }
+        if not all(name in atoms for name in ("CA", "C")) or not all(
+            name in next_atoms for name in ("N", "CA")
+        ):
+            continue
+        b1 = sub(atoms["C"].coord, atoms["CA"].coord)
+        b2 = sub(next_atoms["N"].coord, atoms["C"].coord)
+        b3 = sub(next_atoms["CA"].coord, next_atoms["N"].coord)
+        n1 = normalize(cross(b1, b2), fallback=(0.0, 0.0, 0.0))
+        n2 = normalize(cross(b2, b3), fallback=(0.0, 0.0, 0.0))
+        if n1 == (0.0, 0.0, 0.0) or n2 == (0.0, 0.0, 0.0):
+            continue
+        twist_penalty = 1.0 - abs(dot(n1, n2))
+        if twist_penalty > 0.05:
+            terms["planarity"] += 20.0 * twist_penalty
+    return float(sum(terms.values())), terms
 
 
 def _coarse_nonfinite_coordinate_count(structure: HeavyAtomStructure) -> int:
@@ -2460,8 +2524,9 @@ def _coarse_hydrophobic_burial_term(
     hydrophobic_gamma: float,
     burial_denominator: float = 15.0,
     burial_scale: float = 1.0,
+    legacy_qtf: bool = False,
 ) -> float:
-    hydrophobic_residues = {"ALA", "VAL", "LEU", "ILE", "MET", "PHE", "TRP", "PRO", "CYS"}
+    hydrophobic_residues = {"ALA", "VAL", "LEU", "ILE", "MET", "PHE", "TYR", "TRP", "PRO", "CYS"}
     hydrophobic_atoms = []
     for atom in structure.atoms:
         element = atom.element.strip().upper()
@@ -2476,7 +2541,15 @@ def _coarse_hydrophobic_burial_term(
     if not hydrophobic_atoms:
         return 0.0
     energy = 0.0
-    heavy_atoms = [atom for atom in structure.atoms if atom.element.strip().upper() not in {"H", "D", "T"}]
+    # The archived QTF scorer counted all serialized atoms when estimating
+    # hydrophobic burial, including explicit legacy hydrogens. Preserve that
+    # behavior for NERF-compatible structures; the PHEAT representation remains
+    # heavy-atom-only by default.
+    heavy_atoms = (
+        list(structure.atoms)
+        if legacy_qtf
+        else [atom for atom in structure.atoms if atom.element.strip().upper() not in {"H", "D", "T"}]
+    )
     for atom in hydrophobic_atoms:
         neighbor_count = 0.0
         for other in heavy_atoms:
@@ -2493,20 +2566,29 @@ def _coarse_hbond_term(
     structure: HeavyAtomStructure,
     *,
     residue_index: Mapping[tuple[str, int, str, str, str], int],
+    legacy_qtf: bool = False,
 ) -> float:
     lookup = structure.atom_lookup()
     n_atoms = [atom for atom in structure.atoms if atom.name.strip().upper() == "N"]
     o_atoms = [atom for atom in structure.atoms if atom.name.strip().upper() == "O"]
     energy = 0.0
     residue_keys = structure.residue_keys()
-    for n_atom in n_atoms:
+    for n_index, n_atom in enumerate(n_atoms):
         key = n_atom.residue_key
         res_d = residue_index.get(key)
         if res_d is None:
             continue
         ca_atom = lookup.get((key, "CA"))
-        prev_c = None
-        if res_d > 0:
+        if legacy_qtf:
+            # Archived QTF inferred the donor geometry from positional atom
+            # indices (C = N-index-2, CA = N-index+1), rather than residue-key
+            # lookup. This matters for legacy side-chain/hydrogen ordering.
+            ordered_index = next((i for i, atom in enumerate(structure.atoms) if atom is n_atom), -1)
+            prev_c = structure.atoms[ordered_index - 2] if ordered_index >= 2 and structure.atoms[ordered_index - 2].name.strip().upper() == "C" else None
+            ca_atom = structure.atoms[ordered_index + 1] if ordered_index + 1 < len(structure.atoms) else None
+        else:
+            prev_c = None
+        if not legacy_qtf and res_d > 0:
             prev_key = residue_keys[res_d - 1]
             if prev_key[0] == key[0]:
                 prev_c = lookup.get((prev_key, "C"))
@@ -2534,7 +2616,7 @@ def _coarse_hbond_term(
                 continue
             radial_term = math.exp(-((d_ho - 2.0) ** 2) / 0.5)
             angular_term = (abs(angle_cos) - 0.4) * 2.0
-            energy += -25.0 * radial_term * angular_term
+            energy += -37.5 * radial_term * angular_term
     return float(energy)
 
 
@@ -2581,6 +2663,13 @@ def _coarse_omega_term(
             continue
         val = float(omega)
         if not math.isfinite(val):
+            continue
+        if val == 0.0:
+            # Archived QTF treats a zero omega sentinel as trans (π) for the
+            # centered omega preference, while still applying the window
+            # violation diagnostic separately.
+            val = omega_center
+            energy += 0.0
             continue
         if -omega_max <= val <= -omega_min:
             val = (2.0 * math.pi) + val
@@ -2698,14 +2787,48 @@ def _coarse_vdw_term(structure: HeavyAtomStructure) -> float:
                 continue
             scale_factor = 0.35 if path == 3 else 1.0
             dist = distance(atom_a.coord, atom_b.coord)
-            sigma = _radius(atom_a) + _radius(atom_b)
-            if dist >= sigma:
-                continue
-            term = (sigma / (dist + 0.1)) ** 12
-            if term > 50.0:
-                term = 50.0 + math.log(term - 49.0)
-            energy += scale_factor * 0.1 * term
+            radius_a, epsilon_a = COARSE_LJ_TYPE_PARAMS[_coarse_lj_type(atom_a)]
+            radius_b, epsilon_b = COARSE_LJ_TYPE_PARAMS[_coarse_lj_type(atom_b)]
+            contact_distance = 0.95 * (radius_a + radius_b)
+            sigma = contact_distance / (2.0 ** (1.0 / 6.0))
+            r = max(dist, 1.2)
+            sr6 = (sigma / r) ** 6
+            lj = 4.0 * math.sqrt(epsilon_a * epsilon_b) * (sr6 * sr6 - sr6)
+            repulsive = max(lj, 0.0)
+            if repulsive > 25.0:
+                repulsive = 25.0 + math.log1p(repulsive - 25.0)
+            attractive = min(max(lj, -2.5), 0.0)
+            energy += scale_factor * (0.01 * repulsive + 0.1 * attractive)
     return float(energy)
+
+
+def _coarse_lj_type(atom: Atom) -> str:
+    name = atom.name.strip().upper()
+    element = atom.element.strip().upper()
+    resname = atom.resname.strip().upper()
+    if element == "H" or name.startswith("H"):
+        return "H_polar" if name in {"H", "HN", "HG", "HG1", "HH", "HE1", "HE2"} else "H"
+    if element == "S" or name.startswith("S"):
+        return "S_sulfur"
+    if element == "O":
+        if name in {"O", "OXT"}:
+            return "O_carbonyl"
+        if name in {"OD1", "OD2", "OE1", "OE2"}:
+            return "O_carboxyl"
+        return "O_hydroxyl"
+    if element == "N":
+        return "N_backbone" if name == "N" else "N_sidechain"
+    if element == "C":
+        if name == "C":
+            return "C_carbonyl"
+        if name == "CA":
+            return "C_backbone"
+        if resname in {"PHE", "TYR", "TRP", "HIS"} and name in {
+            "CG", "CD1", "CD2", "CE1", "CE2", "CE3", "CZ", "CZ2", "CZ3", "CH2",
+        }:
+            return "C_aromatic"
+        return "C_aliphatic"
+    return "X"
 
 
 def _coarse_graph_distances_up_to_three(structure: HeavyAtomStructure) -> dict[tuple[int, int], int]:
@@ -2771,18 +2894,44 @@ def _coarse_rotamer_term(
     energy = 0.0
     for index, key in enumerate(residue_keys):
         chi = _decoded_torsion(torsions, index, "chi1")
-        if chi is None:
-            continue
         res = _coarse_residue_one_letter(key)
-        if res in {"V", "I", "T"}:
-            energy += -3.0 * (math.exp(-((chi - math.pi) ** 2) / 0.5) + math.exp(-((chi - (-1.047)) ** 2) / 0.5))
-        elif res == "P":
-            energy += 10.0 * min((chi - (-0.5)) ** 2, (chi - 0.5) ** 2)
-        elif res in {"W", "F", "Y", "H"}:
-            energy += -2.0 * (math.exp(-((chi - math.pi) ** 2) / 0.5) + math.exp(-((chi - (-1.047)) ** 2) / 0.5))
-        else:
-            energy += 1.0 * (1.0 + math.cos(3.0 * chi))
+        if chi is not None:
+            if res in {"V", "I", "T"}:
+                d_trans = _wrapped_angle_delta(chi, math.pi) ** 2
+                d_gplus = _wrapped_angle_delta(chi, -1.0471975512) ** 2
+                energy += -3.0 * (math.exp(-d_trans / 0.5) + math.exp(-d_gplus / 0.5))
+            elif res == "P":
+                d_down = _wrapped_angle_delta(chi, -0.5) ** 2
+                d_up = _wrapped_angle_delta(chi, 0.5) ** 2
+                energy += 10.0 * min(d_down, d_up)
+            elif res in {"W", "F", "Y", "H"}:
+                d_trans = _wrapped_angle_delta(chi, math.pi) ** 2
+                d_gplus = _wrapped_angle_delta(chi, -1.0471975512) ** 2
+                d_gminus = _wrapped_angle_delta(chi, 1.0471975512) ** 2
+                energy += -2.0 * (
+                    math.exp(-d_trans / 0.45)
+                    + 0.8 * math.exp(-d_gplus / 0.45)
+                    + 0.8 * math.exp(-d_gminus / 0.45)
+                )
+            else:
+                energy += 1.0 * (1.0 + math.cos(3.0 * chi))
+
+        centers = (-1.0471975512, 1.0471975512, math.pi)
+        for chi_index in (2, 3, 4):
+            higher_chi = _decoded_torsion(torsions, index, f"chi{chi_index}")
+            if higher_chi is None:
+                continue
+            denominator = 0.35 if chi_index == 2 and res in {"W", "F", "Y", "H"} else 0.50
+            wells = sum(
+                math.exp(-(_wrapped_angle_delta(higher_chi, center) ** 2) / denominator)
+                for center in centers
+            )
+            energy += (-1.5 if chi_index == 2 and res in {"W", "F", "Y", "H"} else -0.75) * wells
     return float(energy)
+
+
+def _wrapped_angle_delta(first: float, second: float) -> float:
+    return (float(first) - float(second) + math.pi) % (2.0 * math.pi) - math.pi
 
 
 def _coarse_ramachandran_term(
@@ -2832,7 +2981,9 @@ def _pheat_physics_charge(
     charges.update(_PHEAT_PHYSICS_CHARGE_TABLES[profile])
     q = float(charges.get(name, 0.0))
     if atom.resname.strip().upper() in {"HIS", "H"}:
-        if name in {"NE2", "ND1"}:
+        if name == "NE2":
+            q = 0.0
+        if name == "ND1":
             q = -0.4
     return q
 
@@ -2854,7 +3005,9 @@ def _pheat_physics_adjacent_heavy_sterics(structure: HeavyAtomStructure) -> floa
                     continue
                 if atom_a.name.strip().upper() == "C" and atom_b.name.strip().upper() == "N":
                     continue
-                threshold = max(1.35, 0.55 * (_radius(atom_a) + _radius(atom_b)))
+                radius_a = COARSE_LJ_TYPE_PARAMS[_coarse_lj_type(atom_a)][0]
+                radius_b = COARSE_LJ_TYPE_PARAMS[_coarse_lj_type(atom_b)][0]
+                threshold = max(1.35, 0.55 * (radius_a + radius_b))
                 dist = distance(atom_a.coord, atom_b.coord)
                 if dist < threshold:
                     energy += 10.0 * ((threshold - dist) / 0.5) ** 2
@@ -3493,12 +3646,57 @@ def _score_gromacs_mdrun(
     )
 
 
+def _with_forcefield_terminal_oxt(structure: HeavyAtomStructure) -> tuple[HeavyAtomStructure, int]:
+    """Return a copy with missing protein-chain terminal OXT atoms completed."""
+    completed = deepcopy(structure)
+    residues = completed.atoms_by_residue()
+    last_by_chain: dict[str, Any] = {}
+    for key in completed.residue_keys():
+        if key[4] == "ATOM":
+            last_by_chain[key[0]] = key
+
+    added = 0
+    next_serial = max((atom.serial or 0 for atom in completed.atoms), default=0) + 1
+    for key in last_by_chain.values():
+        atoms = {atom.name.strip().upper(): atom for atom in residues.get(key, [])}
+        if "OXT" in atoms or not {"N", "CA", "C", "O"}.issubset(atoms):
+            continue
+        n_atom, ca_atom, c_atom, o_atom = (atoms[name] for name in ("N", "CA", "C", "O"))
+        o_dihedral = dihedral_degrees(n_atom.coord, ca_atom.coord, c_atom.coord, o_atom.coord)
+        coord = place_atom(
+            n_atom.coord,
+            ca_atom.coord,
+            c_atom.coord,
+            length=C_O,
+            angle_degrees=ANGLE_CA_C_O,
+            dihedral_degrees=o_dihedral + 180.0,
+        )
+        completed.atoms.append(
+            Atom(
+                name="OXT",
+                element="O",
+                x=coord[0],
+                y=coord[1],
+                z=coord[2],
+                resname=c_atom.resname,
+                chain_id=c_atom.chain_id,
+                resseq=c_atom.resseq,
+                icode=c_atom.icode,
+                record_name=c_atom.record_name,
+                serial=next_serial,
+            )
+        )
+        next_serial += 1
+        added += 1
+    return completed, added
+
+
 def _score_openmm_prepared(structure: HeavyAtomStructure) -> EnergyResult:
     """Explicit OpenMM path that prepares a force-field-ready structure before scoring."""
 
+    prepared_structure, terminal_oxt_added = _with_forcefield_terminal_oxt(structure)
     try:
-        from openmm import Platform, VerletIntegrator, unit
-        from openmm import app
+        from openmm import Platform, VerletIntegrator, app, unit
     except Exception as exc:  # pragma: no cover - depends on optional environment
         raise RuntimeError(
             "openmm-prepared scoring requires the optional Miniforge environment with OpenMM/PDBFixer."
@@ -3512,7 +3710,7 @@ def _score_openmm_prepared(structure: HeavyAtomStructure) -> EnergyResult:
             # OpenMM receives a temporary PDB because this path prepares a force-field
             # topology internally; chain IDs do not affect the energy calculation.
             pdb_path.write_text(
-                structure_to_pdb_string(structure, allow_chain_truncation=True),
+                structure_to_pdb_string(prepared_structure, allow_chain_truncation=True),
                 encoding="utf-8",
             )
             forcefield = app.ForceField("amber14-all.xml", "amber14/tip3pfb.xml")
@@ -3543,10 +3741,15 @@ def _score_openmm_prepared(structure: HeavyAtomStructure) -> EnergyResult:
         total=float(energy),
         units="kJ/mol",
         terms={"potential_energy": float(energy)},
-        warnings=preparation_warnings,
+        warnings=(
+            ([f"added {terminal_oxt_added} missing terminal OXT atom(s) internally for force-field preparation"]
+             if terminal_oxt_added else [])
+            + preparation_warnings
+        ),
         citations=["openmm", "amber-ff14sb"],
         metadata={
             "description": "OpenMM AMBER score after internal structure preparation",
+            "terminal_oxt_added": terminal_oxt_added,
             **preparation_metadata,
         },
     )
@@ -3646,9 +3849,9 @@ def _prepare_pdb_for_forcefield(
             "hydrogens_added": 0,
         }
 
+    prepared_structure, terminal_oxt_added = _with_forcefield_terminal_oxt(structure)
     try:
-        from openmm import Platform
-        from openmm import app
+        from openmm import Platform, app
     except Exception as exc:  # pragma: no cover - depends on optional user environment
         raise RuntimeError(
             "--prepare auto/write for ambertools-sander requires OpenMM for deterministic "
@@ -3658,7 +3861,7 @@ def _prepare_pdb_for_forcefield(
     with tempfile.TemporaryDirectory(prefix="pheat-amber-prep-") as tmpdir:
         pdb_path = Path(tmpdir) / "input.pdb"
         pdb_path.write_text(
-            structure_to_pdb_string(structure, allow_chain_truncation=True),
+            structure_to_pdb_string(prepared_structure, allow_chain_truncation=True),
             encoding="utf-8",
         )
         forcefield = app.ForceField("amber14-all.xml", "amber14/tip3pfb.xml")
@@ -3689,7 +3892,13 @@ def _prepare_pdb_for_forcefield(
         "hydrogen_assignment": "tleap-residue-templates",
         "prepared_coordinate_count": prepared_atom_count - removed_openmm_hydrogens,
         "pH": 7.0,
+        "terminal_oxt_added": terminal_oxt_added,
     }
+    if terminal_oxt_added:
+        warnings = [
+            f"added {terminal_oxt_added} missing terminal OXT atom(s) internally for force-field preparation",
+            *warnings,
+        ]
     if openmm_hydrogens:
         warnings = list(warnings) + [
             "OpenMM/PDBFixer hydrogens were stripped before AmberTools; tleap assigns hydrogens and atom types"
@@ -4113,6 +4322,31 @@ def _run_gromacs_energy_workflow(
             status_stream=status_stream,
             status_label="GROMACS mdrun minimize",
         )
+        minimize_log = work_dir / "minimize.log"
+        minimize_text = minimize_log.read_text(encoding="utf-8", errors="replace") if minimize_log.exists() else ""
+        force_matches = re.findall(
+            r"Maximum\s+force\s*=\s*([0-9.eE+\-]+)",
+            minimize_text,
+            flags=re.IGNORECASE,
+        )
+        if force_matches:
+            final_max_force = float(force_matches[-1])
+        else:
+            # Some GROMACS builds emit the convergence summary without a
+            # parseable force line in the per-run log.  The summary itself is
+            # authoritative for the requested threshold; use that threshold
+            # as a conservative bound rather than reporting NaN.
+            convergence = re.search(
+                r"converged\s+to\s+Fmax\s*<\s*([0-9.eE+\-]+)",
+                minimize_text,
+                flags=re.IGNORECASE,
+            )
+            final_max_force = float(convergence.group(1)) if convergence else math.nan
+        if not math.isfinite(final_max_force) or final_max_force > float(settings.emtol):
+            raise RuntimeError(
+                "GROMACS minimization did not converge to the requested force threshold "
+                f"(emtol={settings.emtol:g}, final Fmax={final_max_force:g})."
+            )
         minimized = work_dir / "minimize.gro"
         if not minimized.exists():
             raise RuntimeError("GROMACS mdrun minimization did not produce minimize.gro.")
@@ -4178,6 +4412,9 @@ def _run_gromacs_energy_workflow(
         energy_edr=energy_edr,
         timeout=timeout,
     )
+    potential = terms.get("potential", terms.get("total_energy"))
+    if potential is None or not math.isfinite(float(potential)) or abs(float(potential)) > 1.0e9:
+        raise RuntimeError("GROMACS produced a non-finite or physically invalid potential energy.")
     command_lines["energy"] = energy_command
     warnings.extend(energy_warnings)
     gromacs_metrics: dict[str, Any] = {}
@@ -4279,22 +4516,33 @@ def _write_pdb_for_gromacs_pdb2gmx(
         )
         return [], direct_metadata
 
+    prepared_structure, terminal_oxt_added = _with_forcefield_terminal_oxt(structure)
+
     try:
-        from openmm import Platform
-        from openmm import app
+        from openmm import Platform, app
     except Exception as exc:  # pragma: no cover - depends on optional user environment
         output_pdb.write_text(
-            structure_to_pdb_string(structure, allow_chain_truncation=True),
+            structure_to_pdb_string(prepared_structure, allow_chain_truncation=True),
             encoding="utf-8",
         )
-        return [
+        warnings = [
             "OpenMM/PDBFixer was unavailable; GROMACS pdb2gmx will prepare the supplied atoms directly"
-        ], {**direct_metadata, "openmm_pdbfixer_unavailable": str(exc)}
+        ]
+        if terminal_oxt_added:
+            warnings.insert(
+                0,
+                f"added {terminal_oxt_added} missing terminal OXT atom(s) internally for force-field preparation",
+            )
+        return warnings, {
+            **direct_metadata,
+            "terminal_oxt_added": terminal_oxt_added,
+            "openmm_pdbfixer_unavailable": str(exc),
+        }
 
     with tempfile.TemporaryDirectory(prefix="pheat-gmx-prep-") as tmpdir:
         pdb_path = Path(tmpdir) / "input.pdb"
         pdb_path.write_text(
-            structure_to_pdb_string(structure, allow_chain_truncation=True),
+            structure_to_pdb_string(prepared_structure, allow_chain_truncation=True),
             encoding="utf-8",
         )
         forcefield = app.ForceField("amber14-all.xml", "amber14/tip3pfb.xml")
@@ -4321,8 +4569,14 @@ def _write_pdb_for_gromacs_pdb2gmx(
         "openmm_hydrogens_removed_before_pdb2gmx": removed_openmm_hydrogens,
         "prepared_coordinate_count": prepared_atom_count - removed_openmm_hydrogens,
         "pH": 7.0,
+        "terminal_oxt_added": terminal_oxt_added,
     }
-    return list(warnings) + [
+    terminal_warnings = (
+        [f"added {terminal_oxt_added} missing terminal OXT atom(s) internally for force-field preparation"]
+        if terminal_oxt_added
+        else []
+    )
+    return terminal_warnings + list(warnings) + [
         "OpenMM/PDBFixer hydrogens were stripped before GROMACS; pdb2gmx assigns force-field hydrogens and topology"
     ], metadata
 
@@ -4499,11 +4753,12 @@ def _run_subprocess(
             stderr=subprocess.PIPE,
             text=True,
         )
-    except FileNotFoundError as exc:
-        raise RuntimeError(f"Command not found: {' '.join(command)}") from exc
+    except FileNotFoundError as file_not_found_exc:
+        raise RuntimeError(f"Command not found: {' '.join(command)}") from file_not_found_exc
 
     started_at = time.monotonic()
-    deadline = (started_at + float(timeout)) if timeout is not None else None
+    timeout_seconds = float(timeout) if timeout is not None else None
+    deadline = (started_at + timeout_seconds) if timeout_seconds is not None else None
     stdin_payload = input_text
     first_call = True
     label = status_label or "subprocess"
@@ -4514,14 +4769,17 @@ def _run_subprocess(
             if remaining <= 0.0:
                 proc.kill()
                 stdout, stderr = proc.communicate()
-                exc = subprocess.TimeoutExpired(list(command), timeout)
-                exc.stdout = stdout
-                exc.stderr = stderr
+                assert timeout_seconds is not None
+                timeout_exc = subprocess.TimeoutExpired(list(command), timeout_seconds)
+                timeout_exc.stdout = stdout.encode("utf-8", errors="replace")
+                timeout_exc.stderr = stderr.encode("utf-8", errors="replace")
                 raise RuntimeError(
-                    f"Command timed out after {timeout} seconds: {' '.join(command)}. "
-                    + _timeout_tail(exc)
-                ) from exc
-            wait_for = min(float(heartbeat_seconds), remaining) if status_stream is not None else remaining
+                    f"Command timed out after {timeout_seconds} seconds: {' '.join(command)}. "
+                    + _timeout_tail(timeout_exc)
+                ) from timeout_exc
+            wait_for: Optional[float] = (
+                min(float(heartbeat_seconds), remaining) if status_stream is not None else remaining
+            )
         else:
             wait_for = float(heartbeat_seconds) if status_stream is not None else None
         try:

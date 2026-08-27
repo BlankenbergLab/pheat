@@ -2,21 +2,20 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
 import hashlib
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import tarfile
 import tempfile
 import warnings
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Callable, Optional
 
 from platformdirs import user_cache_dir
-
 
 DEFAULT_MOLSTAR_VERSION = "5.9.0"
 MOLSTAR_ENV_VAR = "PHEAT_MOLSTAR_DIR"

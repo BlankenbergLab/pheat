@@ -7,7 +7,6 @@ from typing import Dict, Iterable, List
 from pheat.geometry import centroid
 from pheat.models import Atom, Centroid, CentroidStructure, HeavyAtomStructure
 
-
 BACKBONE_ATOMS = {"N", "CA", "C", "O", "OXT"}
 TERMINAL_GROUPS = {
     "near": {"CB", "CG", "CG1", "CG2", "OG", "OG1", "SG"},

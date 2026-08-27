@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import hashlib
-from importlib import resources
 import json
 import lzma
+from importlib import resources
 from pathlib import Path
 from typing import Any, Mapping, Optional, Union
-
 
 SCORE_TABLE_SET_FORMAT = "pheat.score-table-set"
 SCORE_TABLE_SET_VERSION = 1

@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from importlib import resources
 import json
+from importlib import resources
 from pathlib import Path
 from typing import Any, Dict, Mapping, Tuple
-
 
 _SCHEMA_FILES = {
     "atom-structure": "atom-structure.schema.json",

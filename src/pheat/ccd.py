@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import csv
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Optional
 
 from pheat.models import HeavyAtomStructure
 from pheat.residues import CANONICAL_RESIDUES, MODIFIED_RESIDUE_PARENTS
-
 
 _ION_IDS = {
     "AL",

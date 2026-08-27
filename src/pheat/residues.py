@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple, Union
 
-
 CANONICAL_ONE_TO_THREE: Dict[str, str] = {
     "A": "ALA",
     "R": "ARG",

@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import html
-from importlib.metadata import PackageNotFoundError, version
 from collections.abc import Iterable, Mapping
-
+from importlib.metadata import PackageNotFoundError, version
 
 PHEAT_REPOSITORY_URL = "https://github.com/BlankenbergLab/pheat"
 PHEAT_CITATION_TITLE = "PHEAT: Protein Heavy-atom Energy and Analysis Toolkit"

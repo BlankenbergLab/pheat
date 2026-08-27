@@ -5,7 +5,6 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
-
 SCORE_CONTRACT_VERSION = 1
 
 _COMMON_ATOM_STRUCTURE = {
@@ -169,9 +168,9 @@ _CONTRACTS: dict[str, dict[str, Any]] = {
         "burial_dependent": True,
         "coordinate_or_geometry_basis": "coordinates-and-derived-torsions",
     },
-    "pheat-coarse-protein-folding-v1": {
+    "pheat-custom-energy-v1": {
         **_COMMON_ATOM_STRUCTURE,
-        "id": "pheat.score-contract.pheat-coarse-protein-folding-v1.v1",
+        "id": "pheat.score-contract.pheat-custom-energy-v1.v1",
         "default_domain": "protein-heavy",
         "compatible_domains": ["protein-heavy", "all-heavy"],
         "required_atoms": ["heavy-atoms", "backbone-n-ca-c-o", "sidechain-heavy-atoms"],
@@ -264,7 +263,11 @@ def normalize_score_model_id(model: str) -> str:
     """Normalize supported scorer aliases to canonical model IDs."""
 
     normalized = str(model).strip().lower()
-    return "heavy-mm" if normalized == "heavy_mm" else normalized
+    aliases = {
+        "heavy_mm": "heavy-mm",
+        "pheat-coarse-protein-folding-v1": "pheat-custom-energy-v1",
+    }
+    return aliases.get(normalized, normalized)
 
 
 def score_input_contract(model: str) -> dict[str, Any]:
